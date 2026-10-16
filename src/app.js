@@ -38,6 +38,7 @@ const I = {
   sync: '<path d="M4 10a8 8 0 0 1 14-4l2 2M20 14a8 8 0 0 1-14 4l-2-2M20 4v4h-4M4 20v-4h4"/>',
   qr: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/>',
   cam: '<path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/>',
+  phone: '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   trip: '<path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6M2 20h20"/>',
   sun: '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>',
@@ -182,17 +183,45 @@ const dayNo = d => DAYS.indexOf(d);
 const cityOf = d => CITY[d.city];
 const dateLabel = d => { const n = +d.date.slice(8); return d.dow + ' ' + n + ' Oct'; };
 function todayDay() { const t = jst().date; return DAYS.find(d => d.date === t) || (t < DAYS[0].date ? DAYS[0] : null); }
+// art: images from Nano Banana land in art/. Anything missing falls back to drawn placeholders.
+const ART = { ok: {} };
+const cityArt = k => 'art/city-' + (k === 'blr' ? 'depart' : k) + '.webp';
+[['dishes', 'webp'], ['mascot', 'webp']].forEach(([n, x]) => { const im = new Image(); im.onload = () => { ART.ok[n] = 1; if (stack.length) refresh(); }; im.src = 'art/' + n + '.' + x; });
+const img = (src, cls = '', alt = '') => `<img src="${src}" class="${cls}" alt="${esc(alt)}" loading="lazy" onerror="this.remove()">`;
+const clouds = (fill = 'var(--sky)') => `<div class="clouds"><svg viewBox="0 0 400 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46V30c14-10 30-12 44-4 8-16 34-20 48-6 12-12 34-12 44 2 14-14 40-12 50 4 10-10 30-10 40 2 14-16 42-16 54 0 10-10 28-10 38 2 12-12 34-12 46 0 12-8 26-8 36 2V46z" fill="${fill}"/></svg></div>`;
+const MOOD = { happy: 0, worry: 50, proud: 100 };
+const mascot = (mood = 'happy', style = '') => ART.ok.mascot ? `<span class="mimg" style="background-image:url(art/mascot.webp);background-position:${MOOD[mood] ?? 0}% 0;${style}"></span>` : fox(mood === 'proud' ? 'happy' : mood, style ? `style="${style}"` : '');
+const DISH_KEYS = [['yakitori', 'torien', 'kabuto'], ['curry'], ['ramen', 'tsukemen', 'duck'], ['sushi', 'kaiten', 'inari', 'kakinoha', 'kaisendon', 'saba', 'tuna', 'maguro'], ['tempura', 'tendon'], ['okonomiyaki', 'monja', 'yakiniku'], ['takoyaki', 'octopus'], ['hoto', 'udon', 'yoshida'], ['soba', 'yuba'], ['gyoza', 'dumpling', 'butaman', 'bun'], ['crepe', 'cotton', 'melon'], ['mochi', 'manju', 'ningyo', 'yatsuhashi', 'shingen', 'dango'], ['unagi', 'unaju', 'eel'], ['kushikatsu', 'dote', 'skewer', 'wagyu', 'scallop', 'gyukatsu', 'tonkatsu', 'karaage'], ['matcha', 'soft serve', 'ice cream', 'sesame', 'soft'], ['tamagoyaki', 'tako tamago', 'omelette', 'tofu', 'onigiri', 'ekiben', 'bento']];
+function dishIdx(text) { const t = String(text).toLowerCase(); for (let i = 0; i < DISH_KEYS.length; i++) if (DISH_KEYS[i].some(k => t.includes(k))) return i; return -1; }
+const sprite = (i, cls = 'sprite') => ART.ok.dishes && i >= 0 ? `<span class="${cls}" style="background-image:url(art/dishes.webp);background-position:${(i % 4) * 33.333}% ${Math.floor(i / 4) * 33.333}%"></span>` : '';
+const itemDish = it => { if (it.k !== 'meal') return -1; for (const e of (it.eat && it.eat.d) || []) { const i = dishIdx(e[0]); if (i >= 0) return i; } return dishIdx(it.n); };
+const bubble = it => { const di = itemDish(it), sp = sprite(di); return sp ? `<div class="bub dish">${sp}</div>` : `<div class="bub" style="--k:${KIND[it.k][1]}">${ic(kindIcon(it))}</div>`; };
+const CITIES = ['all', 'tokyo', 'nikko', 'fuji', 'kyoto', 'nara', 'osaka'];
+// install: Android gives a prompt event, iOS needs Share > Add to Home Screen
+const INSTALLED = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+let installEvt = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; if (stack.length) refresh(false); });
+addEventListener('appinstalled', () => { installEvt = null; toast('Installed. Open it from your home screen'); });
+async function install() {
+  if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; installEvt = null; if (r.outcome !== 'accepted') toast('Maybe later'); return refresh(false); }
+  sheet(IOS ? `<h2>Add to your home screen</h2><p>Open this page in <b>Safari</b>, then:</p><ol class="steps"><li>Tap the <b>Share</b> button (square with an arrow)</li><li>Scroll down and tap <b>Add to Home Screen</b></li><li>Tap <b>Add</b></li></ol><p>It then opens full screen and works offline.</p>` : `<h2>Add to your home screen</h2><p>In Chrome, tap the <b>⋮</b> menu, then <b>Add to Home screen</b> or <b>Install app</b>.</p><p>It then opens full screen and works offline.</p>`);
+}
 const VIEWS = {
-  home() {
-    const t = jst().date, td = todayDay(), live = td && td.date === t;
+  home(r) {
+    const t = jst().date, td = todayDay(), live = td && td.date === t, filt = r.city || 'all';
     const dleft = Math.round((Date.parse(DAYS[0].date) - Date.parse(t)) / 864e5);
-    let todayCard = '';
+    let banner = '';
     if (td) {
       const rows = compute(td), ci = curIdx(rows), cur = ci >= 0 ? rows[ci] : null;
-      todayCard = `<button class="today rise" data-day="${td.id}" style="--c:${cityOf(td).c}"><div class="dot">${dayNo(td)}</div><div><small>${live ? '今日 Today' : (dleft > 0 ? dleft + ' days to go' : 'Up next')}</small><b>${esc(td.title)}</b><small>${cur ? (live ? 'Now: ' : 'Starts with: ') + esc(cur.it.n) : 'All done'}</small></div></button>`;
+      banner = `<button class="banner lift" data-day="${td.id}"><div class="bt"><small>${live ? '今日 Today · Day ' + dayNo(td) : (dleft > 1 ? dleft + ' days to go' : dleft === 1 ? 'Tomorrow' : 'Up next')}</small><b>${esc(td.title)}</b><span>${cur ? (live ? 'Now: ' : 'First up: ') + esc(cur.it.n) : 'All done for today'}</span><br><span class="go">Open day ${ic('back').replace('<svg', '<svg style="transform:rotate(180deg)"')}</span></div>${mascot('happy', 'width:86px;flex:none')}</button>`;
     }
-    const tiles = DAYS.map((d, i) => `<button class="dtile rise ${d.date < t ? 'past' : ''} ${d.date === t ? 'now' : ''}" style="--c:${cityOf(d).c};--i:${i}" data-day="${d.id}">${changed(d.id) ? '<i class="chg" title="Changed on this phone"></i>' : ''}<div class="k">${cityOf(d).jp}</div><div class="n">Day ${i} · ${cityOf(d).n}</div><div class="d num">${dateLabel(d)}</div><div class="t">${esc(d.title)}</div></button>`).join('');
-    return `<header class="hero home-hero">${fox('happy')}<div class="eyebrow">きつね旅 · Kitsune Tabi</div><h1>Japan, together<span>Oct 18 to 29 · Jovis, Abel, Sheethal, Anria</span></h1><div class="daymeta"><span class="pill">${me ? 'This phone: ' + esc(me) : 'Tap Sync to set your name'}</span></div></header>${todayCard}<div class="section-t"><h2>Every day</h2><span>12 days · 4 cities</span></div><div class="days">${tiles}</div>`;
+    const list = DAYS.filter(d => filt === 'all' || d.city === filt || (filt === 'fuji' && d.id === 'd7'));
+    const tiles = list.map((d, i) => { const c = cityOf(d), n = d.items.filter(x => x.k !== 'home').length; return `<button class="dcard rise ${d.date < t ? 'past' : ''} ${d.date === t ? 'now' : ''}" style="--c:${c.c};--i:${i}" data-day="${d.id}"><div class="pic"><span class="k">${c.jp}</span>${img(cityArt(d.city))}<span class="no">Day ${dayNo(d)}</span></div>${changed(d.id) ? `<span class="chg" title="Changed on this phone">${ic('sync', 2.6)}</span>` : ''}<div class="t">${esc(d.title)}</div><div class="m"><b class="num">${dateLabel(d)}</b><span>${n} stops</span></div></button>`; }).join('');
+    return `<header class="hero home-hero"><div class="topbar"><span class="brand">KONNICHIWA</span><button class="iconbtn" data-me aria-label="Whose phone">${ic('user')}</button></div><div class="stage">${img('art/hero.webp', '', 'Two couples travelling in Japan')}<div class="ph">${ART.ok.mascot ? mascot('happy', 'width:62%;max-width:260px') : fox('happy', 'style="width:64%;max-width:250px;margin-bottom:30px"')}</div></div>${clouds()}</header>
+      ${banner}
+      <div class="catbar" role="tablist">${CITIES.map(k => `<button class="${k === filt ? 'on' : ''}" data-city="${k}">${k === 'all' ? 'All days' : CITY[k].n}</button>`).join('')}</div>
+      <div class="section-t"><h2>${filt === 'all' ? 'Every day' : CITY[filt].n + ' days'}</h2><span>${list.length} day${list.length > 1 ? 's' : ''}</span></div><div class="days">${tiles}</div>`;
   },
   day(r) {
     const d = DAY(r.id), c = cityOf(d), rows = compute(d), live = jst().date === d.date, ci = curIdx(rows), nowM = jst().min;
@@ -201,7 +230,7 @@ const VIEWS = {
     const tasks = d.tasks && d.tasks.length ? `<div class="tasks rise"><h3>Today's checklist</h3>${d.tasks.map((t, i) => `<button class="task ${tk.includes(i) ? 'on' : ''}" data-task="${i}"><i class="cb"></i><span>${esc(t)}</span></button>`).join('')}</div>` : '';
     let tl = '';
     if (r.reorder) {
-      tl = `<p class="hint rise">Drag the handles to change the order. Booked items stay put; everything else moves around them.</p><div class="rlist" id="rlist">${rows.map(x => { const it = x.it, lock = it.fx || it.k === 'home'; return `<div class="rrow ${lock ? 'lock' : ''} ${x.skip ? 'sk' : ''}" data-id="${it.id}"><div class="bub" style="--k:${KIND[it.k][1]}">${ic(kindIcon(it))}</div><div class="nm">${esc(it.n)}<small>${x.skip ? 'Skipped' : fmt(x.start) + ' · ' + dur(x.du)}</small></div><div class="grip" ${lock ? '' : 'data-grip'} aria-label="${lock ? 'Fixed' : 'Drag to reorder'}">${ic(lock ? 'lock' : 'grip')}</div></div>`; }).join('')}</div>`;
+      tl = `<p class="hint rise">Drag the handles to change the order. Booked items stay put; everything else moves around them.</p><div class="rlist" id="rlist">${rows.map(x => { const it = x.it, lock = it.fx || it.k === 'home'; return `<div class="rrow ${lock ? 'lock' : ''} ${x.skip ? 'sk' : ''}" data-id="${it.id}">${bubble(it)}<div class="nm">${esc(it.n)}<small>${x.skip ? 'Skipped' : fmt(x.start) + ' · ' + dur(x.du)}</small></div><div class="grip" ${lock ? '' : 'data-grip'} aria-label="${lock ? 'Fixed' : 'Drag to reorder'}">${ic(lock ? 'lock' : 'grip')}</div></div>`; }).join('')}</div>`;
     } else {
       let n = 0;
       rows.forEach((x, i) => {
@@ -210,27 +239,27 @@ const VIEWS = {
         if (x.leg) {
           const prevIt = rows.slice(0, i).reverse().find(p => !p.skip).it;
           const url = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(qOf(prevIt)) + '&destination=' + encodeURIComponent(qOf(it)) + '&travelmode=' + (x.leg.m === 'walk' ? 'walking' : 'transit');
-          tl += `<div class="leg"><div class="line"></div><div class="lb"><span class="mi">${ic(MODE[x.leg.m] || 'walk')}</span><span class="lt">${esc(x.leg.t)} · <b>${dur(x.leg.min)}</b>${x.leg.est ? ' <span class="est">≈ estimate</span>' : ''}${x.wait > 4 ? `<span class="wait">${dur(x.wait)} spare before this</span>` : ''}</span><a href="${url}" target="_blank" rel="noopener">Route</a></div></div>`;
+          tl += `<div class="leg"><div class="line"></div><div class="lb"><span class="mi">${ic(MODE[x.leg.m] || 'walk')}</span><span class="lt">${esc(x.leg.t)} · <b>${dur(x.leg.min)}</b>${x.leg.est ? ' <span class="est">≈ estimate</span>' : ''}${x.wait > 4 ? `<span class="wait">${dur(x.wait)} spare before this</span>` : ''}</span><a href="${url}" target="_blank" rel="noopener">${ic('map')}Route</a></div></div>`;
         }
-        const isCur = i === ci, isNow = live && nowM >= x.start && nowM < x.end;
+        const isCur = i === ci;
         const tags = [];
-        if (it.fx) tags.push(`<span class="tag fx">${ic('lock', 2.4).replace('<svg', '<svg style="width:11px;height:11px;vertical-align:-1px"')} Booked</span>`);
+        if (it.fx) tags.push(`<span class="tag fx">Booked</span>`);
         if (x.du > 0 && it.k !== 'home') tags.push(`<span class="tag">${dur(x.du)}${it.mx ? ' · up to ' + dur(it.mx) : ''}</span>`);
         if (it.p && !it.fx && it.k !== 'home') tags.push(`<span class="tag ${it.p}">${{ m: 'Must', n: 'Nice to have', s: 'Optional' }[it.p]}</span>`);
         if (x.late) tags.push(`<span class="tag warn">${dur(x.late)} late</span>`);
         if (x.soft) tags.push(`<span class="tag soft">${dur(x.soft)} past ${it.by}</span>`);
         if (x.leaveBy && !x.done) tags.push(`<span class="tag ok">Leave by ${fmt(x.leaveBy.at)}</span>`);
-        tl += `<div class="row rise" style="--i:${n++}"><div class="time num">${fmt(x.start)}${x.du ? `<small>${fmt(x.end)}</small>` : ''}</div><button class="card ${it.fx ? 'fxd' : ''} ${x.done ? 'done' : ''} ${isCur ? 'cur' : ''}" data-item="${it.id}" style="--c:${c.c}"><div class="bub" style="--k:${KIND[it.k][1]}">${ic(kindIcon(it))}</div><div class="body"><div class="nm">${esc(it.n)}</div>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}<div class="meta">${tags.join('')}</div></div>${x.done ? `<span class="hanko ${r.stamped === it.id ? 'new' : ''}">済</span>` : ''}</button></div>`;
+        tl += `<div class="row rise" style="--i:${n++}"><div class="time num">${fmt(x.start)}${x.du ? `<small>${fmt(x.end)}</small>` : ''}</div><button class="card ${x.done ? 'done' : ''} ${isCur ? 'cur' : ''}" data-item="${it.id}">${bubble(it)}<div class="body"><div class="nm">${esc(it.n)}</div>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}<div class="meta">${tags.join('')}</div></div>${x.done ? `<span class="hanko ${r.stamped === it.id ? 'new' : ''}">済</span>` : ''}</button></div>`;
         if (isCur) {
           const fixed = it.fx || it.k === 'ride';
-          tl += `<div class="ctrls rise" style="--c:${c.c}">${it.k === 'home' && it.at
+          tl += `<div class="ctrls rise">${it.k === 'home' && it.at
             ? `<button class="ctrl main" data-act="leave">Leaving now</button><button class="ctrl" data-act="+15">+15 late</button><button class="ctrl" data-act="+30">+30</button>`
             : `<button class="ctrl main" data-act="done">${live && !fixed ? 'Done, moving on' : 'Done'}</button>${fixed ? '' : '<button class="ctrl" data-act="+15">+15 min</button><button class="ctrl" data-act="+30">+30</button><button class="ctrl" data-act="-15">Left 15 early</button>'}`}</div>`;
         }
       });
-      tl += `<div class="endnote">${fox(active.some(a => a.late) ? 'worry' : 'happy', 'style="width:64px"')}${last ? 'Day wraps up around <b class="num">' + fmt(last.end) + '</b>' : ''}${d.stay ? ' · ' + esc(STAYS[d.stay].n) : ''}</div>`;
+      tl += `<div class="endnote">${mascot(active.some(a => a.late) ? 'worry' : 'proud', 'width:84px;margin:4px auto')}${last ? 'Day wraps up around <b class="num">' + fmt(last.end) + '</b>' : ''}${d.stay ? ' · ' + esc(STAYS[d.stay].n) : ''}</div>`;
     }
-    return `<header class="hero" style="--c:${c.c}"><div class="topbar"><button class="iconbtn" data-back aria-label="Back">${ic('back')}</button><span class="pill num">Day ${dayNo(d)} · ${dateLabel(d)}</span></div><div class="kanji">${c.jp}</div><div class="eyebrow">${c.n}${live ? ' · 今日 Today' : ''}</div><h1>${esc(d.title)}</h1><div class="daymeta"><span class="pill">${active.length} stops</span>${d.stay ? `<span class="pill">${ic('bed').replace('<svg', '<svg style="width:14px"')} ${esc(STAYS[d.stay].n)}</span>` : ''}</div></header>
+    return `<header class="hero dayhero"><div class="topbar"><button class="iconbtn" data-back aria-label="Back">${ic('back')}</button><span class="pill am num">Day ${dayNo(d)} · ${dateLabel(d)}</span></div><span class="kanji">${c.jp}</span>${img(cityArt(d.city), 'art')}<div class="eyebrow">${c.n}${live ? ' · 今日 Today' : ''}</div><h1>${esc(d.title)}</h1><div class="daymeta"><span class="pill">${active.length} stops</span>${d.stay ? `<span class="pill">${ic('bed').replace('<svg', '<svg style="width:14px"')} ${esc(STAYS[d.stay].n)}</span>` : ''}</div>${clouds()}</header>
       <div class="toolbar"><button class="chip ${r.reorder ? 'on' : ''}" data-reorder>${ic('reorder')} ${r.reorder ? 'Done reordering' : '並べ替え Reorder'}</button>${changed(d.id) ? `<button class="chip" data-reset>${ic('undo')} Reset day</button>` : ''}</div>${r.reorder ? '' : tasks}<div class="${r.reorder ? '' : 'tl'}">${tl}</div>`;
   },
   item(r) {
@@ -240,31 +269,38 @@ const VIEWS = {
     let pane = '';
     if (cur === 'see') pane = `<div class="box"><h3>${it.k === 'meal' ? 'Good to know' : 'Things to see'}</h3><ul class="list">${it.see.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>${it.op ? `<div class="box"><b>Opens ${it.op}</b></div>` : ''}${it.by ? `<div class="box"><b>Best to arrive by ${it.by}</b></div>` : ''}`;
     if (cur === 'story') pane = `<div class="box story">${it.story.map(p => `<p>${esc(p)}</p>`).join('')}</div>`;
-    if (cur === 'eat') pane = `${it.eat.d ? `<div class="box"><h3>Dishes to try</h3>${it.eat.d.map(e => `<div class="dish"><span class="bowl">${ic('bowl')}</span><div><b>${esc(e[0])}</b><span class="j">${esc(e[1])}</span><p>${esc(e[2])}</p></div></div>`).join('')}</div>` : ''}${it.eat.s ? `<div class="box"><h3>Where to go</h3>${it.eat.s.map(e => `<div class="spot"><b>${esc(e[0])}</b><span>${esc(e[1])}</span></div>`).join('')}</div>` : ''}`;
-    if (cur === 'tix') pane = `${it.bk ? `<div class="box"><h3>Booking details</h3>${it.bk.map(b => `<div class="tk">${esc(b)}</div>`).join('')}</div>` : ''}${it.stay && STAYS[it.stay] ? `<button class="btn full" data-taxi="${it.stay}">${ic('taxi')} Show taxi card (Japanese)</button>` : ''}`;
+    if (cur === 'eat') pane = `${it.eat.d ? `<div class="box"><h3>Dishes to try</h3>${it.eat.d.map(e => { const sp = sprite(dishIdx(e[0] + ' ' + e[1])); return `<div class="dish"><span class="bowl">${sp || ic('bowl')}</span><div><b>${esc(e[0])}</b><span class="j">${esc(e[1])}</span><p>${esc(e[2])}</p></div></div>`; }).join('')}</div>` : ''}${it.eat.s ? `<div class="box"><h3>Where to go</h3>${it.eat.s.map(e => `<div class="spot"><b>${esc(e[0])}</b><span>${esc(e[1])}</span></div>`).join('')}</div>` : ''}`;
+    if (cur === 'tix') pane = `${it.bk ? `<div class="box"><h3>Booking details</h3>${it.bk.map(b => `<div class="tk">${esc(b)}</div>`).join('')}</div>` : ''}${it.stay && STAYS[it.stay] ? `<button class="btn full blue" data-taxi="${it.stay}">${ic('taxi')} Show taxi card (Japanese)</button>` : ''}`;
     const canStep = flexible(x) && !x.skip;
-    return `<header class="hero dhero" style="--c:${c.c}"><div class="topbar"><button class="iconbtn" data-back aria-label="Back">${ic('back')}</button><span class="pill num">${dateLabel(d)}</span></div><div class="kanji">${c.jp}</div><div class="dbig"><div class="bub">${ic(kindIcon(it))}</div><div><h1>${esc(it.n)}</h1>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}</div></div>
-      <div class="facts">${x.skip ? '<div class="fact"><small>Status</small><b>Skipped</b></div>' : `<div class="fact"><small>Arrive</small><b class="num">${fmt(x.start)}</b></div><div class="fact"><small>Leave</small><b class="num">${fmt(x.end)}</b></div><div class="fact"><small>${it.mx ? 'Max here' : 'Length'}</small><b class="num">${dur(it.mx || x.du)}</b></div>`}</div></header>
+    const di = itemDish(it), sp = sprite(di);
+    const pic = sp ? `<div class="dpic food">${sp}` : (it.k === 'place' ? `<div class="dpic" style="--c:${c.c}">${img(cityArt(d.city))}<span class="k">${c.jp}</span>` : `<div class="dpic ${it.k === 'meal' ? 'food' : ''}" style="--c:${c.c}"><span class="bigic">${ic(kindIcon(it), 1.6)}</span><span class="k">${c.jp}</span>`);
+    const badge = it.fx ? ['fx', '券', 'Booked'] : ({ m: ['m', '!', 'Must see'], n: ['n', '★', 'Nice to have'], s: ['s', '?', 'Optional'] }[it.p] || null);
+    return `<header class="hero dhero"><div class="topbar"><button class="iconbtn" data-back aria-label="Back">${ic('back')}</button><span class="pill am num">Day ${dayNo(d)} · ${dateLabel(d)}</span></div><span class="kanji">${c.jp}</span><div class="eyebrow">${c.n}</div></header>
+      <div class="dsheet rise"><div class="grab"></div>${pic}${badge ? `<span class="badge ${badge[0]}"><i>${badge[1]}</i>${badge[2]}</span>` : ''}</div>
+        <div class="dtitle"><div class="r">${x.skip ? 'Skipped' : `<span class="num">${fmt(x.start)} to ${fmt(x.end)}</span>`}</div><h2>${esc(it.n)}</h2>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}</div>
+        ${x.skip ? '' : `<div class="facts"><div class="fact"><small>Arrive</small><b class="num">${fmt(x.start)}</b></div><div class="fact"><small>Leave</small><b class="num">${fmt(x.end)}</b></div><div class="fact"><small>${it.mx ? 'Max here' : 'Length'}</small><b class="num">${dur(it.mx || x.du)}</b></div></div>`}
+      </div>
       ${tabs.length > 1 ? `<div class="seg">${tabs.map(t => `<button class="${t[0] === cur ? 'on' : ''}" data-tab="${t[0]}">${t[2]}<small>${t[1]}</small></button>`).join('')}</div>` : ''}
-      <div class="pane"><div class="pc">${pane || '<div class="empty">' + fox() + 'Nothing to read here, just go!</div>'}</div></div>
-      ${canStep ? `<div class="stepper"><div><b>Planned time: <span class="num">${dur(x.du)}</span></b><small>Between ${dur(it.mn)} and ${dur(it.mx)}</small></div><div class="sb"><button data-step="-5" aria-label="5 minutes less">−</button><button data-step="5" aria-label="5 minutes more">+</button></div></div>` : ''}
+      <div class="pane"><div class="pc">${pane || '<div class="empty">' + mascot('happy', 'width:110px;margin:0 auto') + 'Nothing to read here, just go!</div>'}</div></div>
+      ${canStep ? `<div class="paybar"><div><small>Planned time · ${dur(it.mn)} to ${dur(it.mx)}</small><b class="num">${dur(x.du)}</b></div><div class="sb"><button data-step="-5" aria-label="5 minutes less">−</button><span class="num" style="font-weight:800;min-width:26px;text-align:center">5m</span><button data-step="5" aria-label="5 minutes more">+</button></div></div>` : ''}
       <div class="actions">${it.k !== 'home' && it.k !== 'ride' ? `<a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(qOf(it))}" target="_blank" rel="noopener">${ic('map')} Map</a>` : ''}${x.skip ? `<button class="btn pri" data-restore="${it.id}">Restore</button>` : `<button class="btn ${x.done ? '' : 'pri'}" data-done>${x.done ? 'Undo done' : '済 Mark done'}</button>`}${!x.skip && !it.fx && it.k !== 'home' && it.p !== 'm' ? `<button class="btn full" data-skip>Skip this stop</button>` : ''}</div>`;
   },
   wallet() {
-    const stays = Object.entries(STAYS).map(([k, s], i) => `<div class="box rise" style="--i:${i}"><button class="stay" data-taxi="${k}"><span class="bub" style="--k:#f2643f">${ic('bed')}</span><span style="flex:1"><b>${esc(s.n)}</b><br><small style="color:var(--ink-2)">${esc(s.dates)} · ${esc(s.ref)}</small></span><span class="tag m">Taxi card</span></button></div>`).join('');
-    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:${cityOf(d).c}">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + i.at + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>`).join('')}</div>`; }).join('');
-    return `<header class="hero" style="--c:#7a3b69">${fox('happy', 'style="position:absolute;right:10px;top:calc(14px + env(safe-area-inset-top,0px));width:96px"')}<div class="eyebrow">券 Wallet</div><h1>Tickets and<br>taxi cards</h1><div class="sub">Every booking in one place.</div></header><div class="wal"><div class="section-t" style="margin:12px 4px 10px"><h2>Where we sleep</h2><span>Tap for Japanese</span></div>${stays}<div class="section-t" style="margin:20px 4px 10px"><h2>Bookings</h2></div>${bks}</div>`;
+    const stays = Object.entries(STAYS).map(([k, s], i) => `<div class="box rise" style="--i:${i}"><button class="stay" data-taxi="${k}"><span class="bub" style="--k:#1f6feb">${ic('bed')}</span><span style="flex:1"><b>${esc(s.n)}</b><br><small style="color:var(--ink-2)">${esc(s.dates)} · ${esc(s.ref)}</small></span><span class="tag fx">Taxi card</span></button></div>`).join('');
+    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:var(--blue-d)">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + i.at + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>`).join('')}</div>`; }).join('');
+    return `<header class="hero">${mascot('proud', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">券 Wallet</div><h1>Tickets and taxi cards</h1><div class="sub">Every booking in one place.</div>${clouds()}</header><div class="wal"><div class="section-t" style="margin:8px 4px 10px"><h2>Where we sleep</h2><span>Tap for Japanese</span></div>${stays}<div class="section-t" style="margin:20px 4px 10px"><h2>Bookings</h2></div>${bks}</div>`;
   },
   sync() {
     const u = store.get(UNDO), nch = DAYS.filter(d => changed(d.id)).length;
-    return `<header class="hero" style="--c:#2c62b8">${fox('happy', 'style="position:absolute;right:10px;top:calc(14px + env(safe-area-inset-top,0px));width:96px"')}<div class="eyebrow">同期 Sync</div><h1>Sync my app<br>with others</h1><div class="sub">${nch ? nch + ' day' + (nch > 1 ? 's' : '') + ' changed on this phone' : 'No changes yet: same plan as everyone'}</div></header>
+    return `<header class="hero">${mascot('happy', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">同期 Sync</div><h1>Sync my app with others</h1><div class="sub">${nch ? nch + ' day' + (nch > 1 ? 's' : '') + ' changed on this phone' : 'No changes yet: same plan as everyone'}</div>${clouds()}</header>
       <div class="syncgrid">
-      <button class="big rise" style="--i:0" data-me><span class="bub" style="--k:#7a3b69">${ic('user')}</span><span><b>${me ? 'This is ' + esc(me) + '\'s phone' : 'Who\'s phone is this?'}</b><span>Shown to others when you share</span></span></button>
-      <button class="big rise" style="--i:1" data-qr><span class="bub" style="--k:#e8452c">${ic('qr')}</span><span><b>Show my QR code</b><span>Others scan it to copy your plan</span></span></button>
-      <button class="big rise" style="--i:2" data-scan><span class="bub" style="--k:#2c62b8">${ic('cam')}</span><span><b>Scan a QR code</b><span>Replace your plan with someone else's</span></span></button>
-      <button class="big rise" style="--i:3" data-link><span class="bub" style="--k:#4f9a3c">${ic('link')}</span><span><b>Share as a link</b><span>Send it in the WhatsApp group</span></span></button>
-      ${u ? `<button class="big rise" style="--i:4" data-undo><span class="bub" style="--k:#7b5a69">${ic('undo')}</span><span><b>Undo last sync</b><span>Go back to your plan before the import</span></span></button>` : ''}
-      ${nch ? `<button class="big rise" style="--i:5" data-resetall><span class="bub" style="--k:#b0919d">${ic('sync')}</span><span><b>Reset to the original plan</b><span>Clears every change on this phone</span></span></button>` : ''}
+      ${INSTALLED() ? '' : `<button class="big rise install" style="--i:0" data-install><span class="bub" style="--k:#f08a00">${ic('phone')}</span><span><b>Install the app</b><span>Home screen icon, works offline</span></span></button>`}
+      <button class="big rise" style="--i:0" data-me><span class="bub" style="--k:#0f1b3d">${ic('user')}</span><span><b>${me ? 'This is ' + esc(me) + '\'s phone' : 'Whose phone is this?'}</b><span>Shown to others when you share</span></span></button>
+      <button class="big rise" style="--i:1" data-qr><span class="bub" style="--k:#f08a00">${ic('qr')}</span><span><b>Show my QR code</b><span>Others scan it to copy your plan</span></span></button>
+      <button class="big rise" style="--i:2" data-scan><span class="bub" style="--k:#1f6feb">${ic('cam')}</span><span><b>Scan a QR code</b><span>Replace your plan with someone else's</span></span></button>
+      <button class="big rise" style="--i:3" data-link><span class="bub" style="--k:#20a464">${ic('link')}</span><span><b>Share as a link</b><span>Send it in the WhatsApp group</span></span></button>
+      ${u ? `<button class="big rise" style="--i:4" data-undo><span class="bub" style="--k:#4b5a7c">${ic('undo')}</span><span><b>Undo last sync</b><span>Go back to your plan before the import</span></span></button>` : ''}
+      ${nch ? `<button class="big rise" style="--i:5" data-resetall><span class="bub" style="--k:#e8452c">${ic('sync')}</span><span><b>Reset to the original plan</b><span>Clears every change on this phone</span></span></button>` : ''}
       </div>`;
   }
 };
@@ -284,8 +320,8 @@ function showPlan(day, p, mode) {
   refresh();
   const sel = p.ch.map(() => true);
   const head = mode === 'late'
-    ? `<div class="foxrow">${fox('worry')}<div><h2>Running behind</h2><p>To stay on time for <b>${esc(p.target.it.n)}</b>${p.target.it.fx ? ' at ' + p.target.it.at : ''}, the app suggests:</p></div></div>`
-    : `<div class="foxrow">${fox('happy')}<div><h2>${dur(p.spare)} to spare</h2><p>Before <b>${esc(p.target.it.n)}</b>. Spend it here, or keep it as free time.</p></div></div>`;
+    ? `<div class="foxrow">${mascot('worry')}<div><h2>Running behind</h2><p>To stay on time for <b>${esc(p.target.it.n)}</b>${p.target.it.fx ? ' at ' + p.target.it.at : ''}, the app suggests:</p></div></div>`
+    : `<div class="foxrow">${mascot('proud')}<div><h2>${dur(p.spare)} to spare</h2><p>Before <b>${esc(p.target.it.n)}</b>. Spend it here, or keep it as free time.</p></div></div>`;
   const body = () => p.ch.map((c, i) => `<button class="opt ${sel[i] ? 'on' : ''}" data-i="${i}"><i class="cb"></i><span><b>${esc(c.label)}</b><span>${esc(c.note)}</span></span></button>`).join('') + (p.left ? `<p style="color:var(--red);font-weight:700;margin-top:8px">Even then you'd be ${dur(p.left.late || p.left.soft)} late for ${esc(p.left.it.n)}. A taxi may help.</p>` : '');
   sheet(`${head}<div id="opts">${body()}</div><div class="actions" style="padding:8px 0 0"><button class="btn" data-keep>${mode === 'late' ? 'Keep as is' : 'Free time'}</button><button class="btn pri" data-apply>Apply</button></div>`, el => {
     el.addEventListener('click', e => {
@@ -303,6 +339,7 @@ function bind(v, r) {
     if (t.dataset.day) return go({ v: 'day', id: t.dataset.day });
     if (t.dataset.item) return go({ v: 'item', id: t.dataset.item });
     if (t.dataset.tab) { r.tab = t.dataset.tab; return refresh(); }
+    if (t.dataset.city) { r.city = t.dataset.city; return refresh(); }
     if (t.dataset.taxi) return taxi(t.dataset.taxi);
     const day = r.v === 'day' ? DAY(r.id) : (r.v === 'item' ? DAY(ITEM[r.id].day) : null);
     if (t.dataset.task != null) { const all = store.get(TK) || {}; const a = all[day.id] = all[day.id] || []; const i = +t.dataset.task; const k = a.indexOf(i); k < 0 ? a.push(i) : a.splice(k, 1); store.set(TK, all); t.classList.toggle('on'); return; }
@@ -320,6 +357,7 @@ function bind(v, r) {
     if (t.dataset.step) { const rows = compute(day), row = rows.find(y => y.it.id === r.id); const x = X(day.id, r.id); const nv = Math.min(row.it.mx, Math.max(row.it.mn, row.du + +t.dataset.step)); if (nv === row.du) return toast('That\'s the ' + (+t.dataset.step > 0 ? 'max' : 'min') + ' for this stop'); x.du = nv; return afterChange(day, +t.dataset.step > 0 ? 'late' : 'early'); }
     if (t.matches('[data-done]')) { const x = X(day.id, r.id); x.dn ? delete x.dn : (x.dn = 1); save(); refresh(); return toast(x.dn ? '済 Done!' : 'Marked not done'); }
     if (t.matches('[data-skip]')) { X(day.id, r.id).sk = 1; save(); return afterChange(day, 'early'); }
+    if (t.matches('[data-install]')) return install();
     if (t.matches('[data-me]')) return pickMe();
     if (t.matches('[data-qr]')) return showQR();
     if (t.matches('[data-scan]')) return scan();
@@ -369,7 +407,7 @@ function parse(txt) {
 }
 function offerImport(N) {
   const n = Object.keys(N.d).length, when = new Date(N.ts + 9 * 3600e3).toISOString();
-  sheet(`<div class="foxrow">${fox()}<div><h2>Use ${esc(N.by)}'s plan?</h2><p>Updated ${when.slice(5, 10).replace('-', '/')} at ${when.slice(11, 16)} JST · ${n ? n + ' changed day' + (n > 1 ? 's' : '') : 'the original plan'}. Your current plan is kept for Undo.</p></div></div><div class="actions" style="padding:8px 0 0"><button class="btn" data-no>Cancel</button><button class="btn pri" data-yes>Replace mine</button></div>`, el => { el.querySelector('[data-no]').onclick = () => closeSheet(); el.querySelector('[data-yes]').onclick = () => { store.set(UNDO, S); S = N; store.set(KEY, S); closeSheet(); root(tab, stack[0] || { v: 'home' }); toast('Synced with ' + N.by); }; });
+  sheet(`<div class="foxrow">${mascot('happy')}<div><h2>Use ${esc(N.by)}'s plan?</h2><p>Updated ${when.slice(5, 10).replace('-', '/')} at ${when.slice(11, 16)} JST · ${n ? n + ' changed day' + (n > 1 ? 's' : '') : 'the original plan'}. Your current plan is kept for Undo.</p></div></div><div class="actions" style="padding:8px 0 0"><button class="btn" data-no>Cancel</button><button class="btn pri" data-yes>Replace mine</button></div>`, el => { el.querySelector('[data-no]').onclick = () => closeSheet(); el.querySelector('[data-yes]').onclick = () => { store.set(UNDO, S); S = N; store.set(KEY, S); closeSheet(); root(tab, stack[0] || { v: 'home' }); toast('Synced with ' + N.by); }; });
 }
 function showQR() {
   if (!me) return pickMe(showQR);
@@ -397,12 +435,12 @@ async function scan() {
 async function shareLink() {
   if (!me) return pickMe(shareLink);
   const url = location.href.split('#')[0] + '#' + payload();
-  try { if (navigator.share) { await navigator.share({ title: me + '\'s Kitsune plan', text: 'Tap to sync our Japan plan', url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  try { if (navigator.share) { await navigator.share({ title: me + '\'s Konnichiwa plan', text: 'Tap to sync our Japan plan', url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { sheet(`<h2>Copy this link</h2><p>Long-press to copy, then send it in the group.</p><div class="tk">${esc(url)}</div>`); }
 }
 
 // ---------- boot
-document.body.insertAdjacentHTML('beforeend', `<div class="tabs"><nav>${[['home', 'trip', 'Trip', '旅'], ['today', 'sun', 'Today', '今日'], ['wallet', 'wallet', 'Wallet', '券'], ['sync', 'sync', 'Sync', '同期']].map(t => `<button class="tab" data-t="${t[0]}">${ic(t[1])}<span>${t[2]}</span><span class="jp">${t[3]}</span></button>`).join('')}</nav></div>`);
+document.body.insertAdjacentHTML('beforeend', `<div class="tabs"><nav>${[['home', 'trip', 'Trip', '旅'], ['today', 'sun', 'Today', '今日'], ['wallet', 'wallet', 'Wallet', '券'], ['sync', 'sync', 'Sync', '同期']].map(t => `<button class="tab" data-t="${t[0]}"><span class="ti">${ic(t[1])}</span><span>${t[2]} ${t[3]}</span></button>`).join('')}</nav></div>`);
 document.querySelector('.tabs').addEventListener('click', e => {
   const b = e.target.closest('.tab'); if (!b) return; const t = b.dataset.t;
   if (t === 'home') return root('home', { v: 'home' });

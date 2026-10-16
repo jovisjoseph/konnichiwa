@@ -1,6 +1,6 @@
 // Trip content. Times are JST "HH:MM". Only items with fx:true are fixed; others are computed.
 // p: m = must, n = nice, s = skippable. mn/mx = min/max minutes. by = latest sensible start. op = opening time.
-const PEOPLE = ['Jovis', 'Abel', 'Sheethal', 'Anria'];
+const PEOPLE = ['Jovis', 'Anria', 'Abel', 'Sheethal'];
 
 const STAYS = {
   bites: { n: 'BITES by Voyan', jp: 'BITES by Voyan（ホテル）', addr: '東京都新宿区若松町11-3', near: '都営大江戸線 若松河田駅 徒歩1分', en: '11-3 Wakamatsucho, Shinjuku-ku, Tokyo', tel: '+81 80-1133-9452', ref: 'Airbnb HMWBM8HE8Z', dates: 'Oct 19 to 24' },
