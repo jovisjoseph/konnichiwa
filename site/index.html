@@ -112,8 +112,8 @@ a{color:inherit}
 .task.on .cb::after,.opt.on .cb::after{content:"";width:10px;height:6px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:rotate(-45deg) translate(1px,-1px)}
 .task.on span{color:var(--ink-3);text-decoration:line-through}
 .tl{padding:16px 16px 10px}
-.row{display:grid;grid-template-columns:50px 1fr;gap:10px;align-items:start}
-.time{padding-top:16px;text-align:right;font-weight:800;font-size:15px;line-height:1.1;color:var(--blue-d)}
+.row{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:start}
+.time{padding-top:16px;text-align:right;font-weight:800;font-size:14px;white-space:nowrap;line-height:1.1;color:var(--blue-d)}
 .time small{display:block;font-weight:600;font-size:11px;color:var(--ink-3);margin-top:4px}
 .card{position:relative;width:100%;text-align:left;background:#fff;border-radius:var(--r-md);padding:12px 14px 12px 12px;box-shadow:var(--shadow-sm);display:flex;gap:12px;align-items:flex-start;transition:transform .2s var(--spring)}
 .card:active{transform:scale(.98)}
@@ -138,7 +138,7 @@ a{color:inherit}
 .hanko{position:absolute;right:10px;top:8px;width:48px;height:48px;border:3px solid var(--red);border-radius:50%;color:var(--red);display:grid;place-items:center;font-family:var(--jp);font-weight:800;font-size:21px;transform:rotate(-14deg);background:rgba(255,255,255,.75)}
 .hanko.new{animation:stamp .5s var(--spring) both}
 @keyframes stamp{0%{transform:scale(2.4) rotate(-30deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-14deg)}}
-.leg{display:grid;grid-template-columns:50px 1fr;gap:10px;margin:3px 0}
+.leg{display:grid;grid-template-columns:62px 1fr;gap:8px;margin:3px 0}
 .leg .line{justify-self:end;width:3px;margin-right:9px;background-image:linear-gradient(var(--blue) 55%,transparent 0);background-size:3px 9px;opacity:.35;min-height:48px}
 .leg .lb{display:flex;align-items:center;gap:9px;padding:9px 2px;font-size:12.5px;color:var(--ink-2);line-height:1.35}
 .leg .mi{width:32px;height:32px;border-radius:50%;background:var(--blue);display:grid;place-items:center;flex:none;color:#fff;box-shadow:0 0 0 4px var(--sky-2)}
@@ -230,7 +230,7 @@ a{color:inherit}
 
 /* tab bar */
 .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:40;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
-.tabs nav{pointer-events:auto;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-radius:28px;box-shadow:0 -4px 30px -10px rgba(13,58,147,.35);padding:8px}
+.tabs nav{pointer-events:auto;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-radius:28px;box-shadow:0 -4px 30px -10px rgba(13,58,147,.35);padding:8px}
 .tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;color:var(--ink-3);font-size:11px;font-weight:800}
 .tab .ti{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;transition:all .3s var(--spring)}
 .tab svg{width:23px;height:23px}
@@ -285,6 +285,34 @@ a{color:inherit}
 .steps{margin:10px 0 14px 20px;line-height:1.7}.steps li{padding-left:4px}
 
 .banner.lift{z-index:4;margin-top:-86px;box-shadow:0 14px 34px rgba(13,58,147,.28);animation:rise .5s var(--ease) both}
+a.big,a.big *{text-decoration:none;color:inherit}a.big>span>b{color:var(--navy)}a.big>span>span{color:var(--ink-2)}
+
+.time i{font-style:normal;font-size:10px;font-weight:800;margin-left:1px;text-transform:uppercase;letter-spacing:.02em}
+.hero .total{position:relative;z-index:2;margin-top:14px;display:inline-flex;flex-direction:column;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:12px 18px;backdrop-filter:blur(6px)}
+.hero .total small{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.hero .total b{font-family:var(--display);font-weight:400;font-size:36px;line-height:1.1;color:#fff;text-shadow:0 3px 0 rgba(13,58,147,.5)}
+.hero .total span{font-size:13px;font-weight:600;opacity:.9}
+.addform{display:flex;gap:8px;margin:14px 16px 0;background:#fff;border-radius:22px;padding:8px;box-shadow:var(--shadow-sm)}
+.addform input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:16px;padding:10px 10px;background:transparent;color:var(--navy)}
+.addform .btn{padding:10px 18px;border-radius:16px}
+.shoplist{display:grid;gap:10px;padding:0 16px}
+.shoprow{display:flex;align-items:center;gap:12px;background:#fff;border-radius:var(--r-md);padding:12px 10px 12px 12px;box-shadow:var(--shadow-sm)}
+.shoprow .bub{width:42px;height:42px;flex:none}
+.shoprow .nm{flex:1;min-width:0;font-weight:800;font-size:15px;overflow-wrap:anywhere}
+.shoprow .nm small{display:block;font-weight:600;font-size:12px;color:var(--ink-3);margin-top:2px}
+.shoprow .buy{background:var(--amber);color:var(--navy);font-weight:800;font-size:14px;padding:9px 16px;border-radius:999px;box-shadow:0 4px 0 -1px var(--amber-d)}
+.shoprow .price{font-weight:800;font-size:16px;color:var(--blue-d);padding:8px 6px}
+.shoprow .x{width:32px;height:32px;border-radius:50%;font-size:20px;line-height:1;color:var(--ink-3);flex:none}
+.shoprow.got .nm{color:var(--ink-2)}
+.priceform{display:flex;align-items:center;gap:8px;background:var(--sky);border-radius:20px;padding:6px 16px;margin:6px 0 4px}
+.priceform span{font-family:var(--display);font-size:30px;color:var(--blue-d)}
+.priceform input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:30px;font-weight:800;color:var(--navy);padding:8px 0}
+.tab span:last-child{white-space:nowrap}
+.tab{font-size:10.5px;min-width:0}.tab .ti{width:44px;height:44px}
+
+.hero .total em{font-style:normal;font-weight:800;font-size:17px;color:#ffd77a;margin:2px 0 4px}
+.shoprow .price{text-align:right;line-height:1.15}.shoprow .price small{display:block;font-size:12px;font-weight:700;color:var(--ink-3)}
+.pricehint{font-size:14px;font-weight:700;color:var(--ink-3);margin:2px 4px 0}
 </style>
 <div id="app"></div>
 <script>//---------------------------------------------------------------------
@@ -13155,9 +13183,12 @@ const DAYS = [
 'use strict';
 // ---------- helpers
 const $ = (s, r = document) => r.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ap = (h, mm) => (h % 12 || 12) + ':' + mm + (h < 12 ? ' am' : ' pm');
+const t12 = s => String(s ?? '').replace(/\b([01]?\d|2[0-3]):([0-5]\d)\b(?!\s?[ap]m)/g, (_, h, mm) => ap(+h, mm));
+const esc = s => t12(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const toMin = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
-const fmt = m => { m = Math.round(m); const d = ((m % 1440) + 1440) % 1440; return String(Math.floor(d / 60)).padStart(2, '0') + ':' + String(d % 60).padStart(2, '0'); };
+const fmt = m => { m = Math.round(m); const d = ((m % 1440) + 1440) % 1440; return ap(Math.floor(d / 60), String(d % 60).padStart(2, '0')); };
+const tcol = m => fmt(m).replace(' ', '<i>') + '</i>';
 const dur = m => m >= 60 ? (Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) : '')) : m + ' min';
 const r5 = m => Math.max(5, Math.round(m / 5) * 5);
 const jst = () => { const d = new Date(Date.now() + 9 * 3600e3); return { date: d.toISOString().slice(0, 10), min: d.getUTCHours() * 60 + d.getUTCMinutes() }; };
@@ -13200,6 +13231,8 @@ const I = {
   reorder: '<path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/>',
   undo: '<path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  bag: '<path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
   map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/>'
 };
 const ic = (n, sw = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || ''}</svg>`;
@@ -13401,9 +13434,9 @@ const VIEWS = {
         if (x.du > 0 && it.k !== 'home') tags.push(`<span class="tag">${dur(x.du)}${it.mx ? ' · up to ' + dur(it.mx) : ''}</span>`);
         if (it.p && !it.fx && it.k !== 'home') tags.push(`<span class="tag ${it.p}">${{ m: 'Must', n: 'Nice to have', s: 'Optional' }[it.p]}</span>`);
         if (x.late) tags.push(`<span class="tag warn">${dur(x.late)} late</span>`);
-        if (x.soft) tags.push(`<span class="tag soft">${dur(x.soft)} past ${it.by}</span>`);
+        if (x.soft) tags.push(`<span class="tag soft">${dur(x.soft)} past ${t12(it.by)}</span>`);
         if (x.leaveBy && !x.done) tags.push(`<span class="tag ok">Leave by ${fmt(x.leaveBy.at)}</span>`);
-        tl += `<div class="row rise" style="--i:${n++}"><div class="time num">${fmt(x.start)}${x.du ? `<small>${fmt(x.end)}</small>` : ''}</div><button class="card ${x.done ? 'done' : ''} ${isCur ? 'cur' : ''}" data-item="${it.id}">${bubble(it)}<div class="body"><div class="nm">${esc(it.n)}</div>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}<div class="meta">${tags.join('')}</div></div>${x.done ? `<span class="hanko ${r.stamped === it.id ? 'new' : ''}">済</span>` : ''}</button></div>`;
+        tl += `<div class="row rise" style="--i:${n++}"><div class="time num">${tcol(x.start)}${x.du ? `<small>${fmt(x.end)}</small>` : ''}</div><button class="card ${x.done ? 'done' : ''} ${isCur ? 'cur' : ''}" data-item="${it.id}">${bubble(it)}<div class="body"><div class="nm">${esc(it.n)}</div>${it.jp ? `<div class="jp">${esc(it.jp)}</div>` : ''}<div class="meta">${tags.join('')}</div></div>${x.done ? `<span class="hanko ${r.stamped === it.id ? 'new' : ''}">済</span>` : ''}</button></div>`;
         if (isCur) {
           const fixed = it.fx || it.k === 'ride';
           tl += `<div class="ctrls rise">${it.k === 'home' && it.at
@@ -13421,7 +13454,7 @@ const VIEWS = {
     const tabs = [['see', '見る', 'See', it.see], ['story', '物語', 'Story', it.story], ['eat', '食べる', 'Eat', it.eat], ['tix', '券', 'Ticket', it.bk || (it.stay && it.k === 'stay')]].filter(t => t[3]);
     const cur = r.tab && tabs.some(t => t[0] === r.tab) ? r.tab : (tabs[0] ? tabs[0][0] : null);
     let pane = '';
-    if (cur === 'see') pane = `<div class="box"><h3>${it.k === 'meal' ? 'Good to know' : 'Things to see'}</h3><ul class="list">${it.see.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>${it.op ? `<div class="box"><b>Opens ${it.op}</b></div>` : ''}${it.by ? `<div class="box"><b>Best to arrive by ${it.by}</b></div>` : ''}`;
+    if (cur === 'see') pane = `<div class="box"><h3>${it.k === 'meal' ? 'Good to know' : 'Things to see'}</h3><ul class="list">${it.see.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>${it.op ? `<div class="box"><b>Opens ${t12(it.op)}</b></div>` : ''}${it.by ? `<div class="box"><b>Best to arrive by ${t12(it.by)}</b></div>` : ''}`;
     if (cur === 'story') pane = `<div class="box story">${it.story.map(p => `<p>${esc(p)}</p>`).join('')}</div>`;
     if (cur === 'eat') pane = `${it.eat.d ? `<div class="box"><h3>Dishes to try</h3>${it.eat.d.map(e => { const sp = sprite(dishIdx(e[0] + ' ' + e[1])); return `<div class="dish"><span class="bowl">${sp || ic('bowl')}</span><div><b>${esc(e[0])}</b><span class="j">${esc(e[1])}</span><p>${esc(e[2])}</p></div></div>`; }).join('')}</div>` : ''}${it.eat.s ? `<div class="box"><h3>Where to go</h3>${it.eat.s.map(e => `<div class="spot"><b>${esc(e[0])}</b><span>${esc(e[1])}</span></div>`).join('')}</div>` : ''}`;
     if (cur === 'tix') pane = `${it.bk ? `<div class="box"><h3>Booking details</h3>${it.bk.map(b => `<div class="tk">${esc(b)}</div>`).join('')}</div>` : ''}${it.stay && STAYS[it.stay] ? `<button class="btn full blue" data-taxi="${it.stay}">${ic('taxi')} Show taxi card (Japanese)</button>` : ''}`;
@@ -13441,8 +13474,18 @@ const VIEWS = {
   },
   wallet() {
     const stays = Object.entries(STAYS).map(([k, s], i) => `<div class="box rise" style="--i:${i}"><button class="stay" data-taxi="${k}"><span class="bub" style="--k:#1f6feb">${ic('bed')}</span><span style="flex:1"><b>${esc(s.n)}</b><br><small style="color:var(--ink-2)">${esc(s.dates)} · ${esc(s.ref)}</small></span><span class="tag fx">Taxi card</span></button></div>`).join('');
-    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:var(--blue-d)">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + i.at + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>`).join('')}</div>`; }).join('');
+    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:var(--blue-d)">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + t12(i.at) + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>`).join('')}</div>`; }).join('');
     return `<header class="hero">${mascot('proud', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">券 Wallet</div><h1>Tickets and taxi cards</h1><div class="sub">Every booking in one place.</div>${clouds()}</header><div class="wal"><div class="section-t" style="margin:8px 4px 10px"><h2>Where we sleep</h2><span>Tap for Japanese</span></div>${stays}<div class="section-t" style="margin:20px 4px 10px"><h2>Bookings</h2></div>${bks}</div>`;
+  },
+  shop() {
+    const L = shop(), todo = L.filter(x => x.p == null), got = L.filter(x => x.p != null).sort((a, b) => b.at - a.at), total = got.reduce((a, x) => a + x.p, 0);
+    const row = (x, i) => `<div class="shoprow rise ${x.p != null ? 'got' : ''}" style="--i:${i}"><span class="bub" style="--k:${x.p != null ? '#20a464' : '#f08a00'}">${ic(x.p != null ? 'check' : 'bag')}</span><div class="nm">${esc(x.n)}${x.p != null ? `<small>Bought ${new Date(x.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}</div>${x.p != null ? `<button class="price num" data-price="${x.id}">${yen(x.p)}<small>${inr(x.p)}</small></button>` : `<button class="buy" data-buy="${x.id}">Buy</button>`}<button class="x" data-del="${x.id}" aria-label="Remove">×</button></div>`;
+    return `<header class="hero">${mascot('proud', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">買い物 Shopping</div><h1>Souvenir list</h1><div class="total"><small>Spent this trip</small><b class="num">${yen(total)}</b><em class="num">≈ ${inr(total)}</em><span>${got.length} bought · ${todo.length} to buy</span></div>${clouds()}</header>
+      <form class="addform rise" data-add><input name="n" type="text" placeholder="Add something to buy" autocomplete="off" enterkeyhint="done" maxlength="80"><button class="btn pri" type="submit">Add</button></form>
+      ${todo.length ? `<div class="section-t"><h2>To buy</h2><span>${todo.length}</span></div><div class="shoplist">${todo.map(row).join('')}</div>` : ''}
+      ${got.length ? `<div class="section-t"><h2>Bought</h2><span class="num">${yen(total)} · ${inr(total)}</span></div><div class="shoplist">${got.map(row).join('')}</div>` : ''}
+      ${L.length ? '' : `<div class="empty">${mascot('happy', 'width:110px;margin:0 auto 6px')}Add the Seiko watch, the KitKats and whatever else is on everyone's list. Tap Buy when you get it.</div>`}
+      <p class="hint" style="margin:6px 20px 0;text-align:center">Saved on this phone only.</p>`;
   },
   sync() {
     const u = store.get(UNDO), nch = DAYS.filter(d => changed(d.id)).length;
@@ -13455,7 +13498,9 @@ const VIEWS = {
       <button class="big rise" style="--i:3" data-link><span class="bub" style="--k:#20a464">${ic('link')}</span><span><b>Share as a link</b><span>Send it in the WhatsApp group</span></span></button>
       ${u ? `<button class="big rise" style="--i:4" data-undo><span class="bub" style="--k:#4b5a7c">${ic('undo')}</span><span><b>Undo last sync</b><span>Go back to your plan before the import</span></span></button>` : ''}
       ${nch ? `<button class="big rise" style="--i:5" data-resetall><span class="bub" style="--k:#e8452c">${ic('sync')}</span><span><b>Reset to the original plan</b><span>Clears every change on this phone</span></span></button>` : ''}
-      </div>`;
+      </div>
+      <div class="section-t" style="margin:22px 20px 10px"><h2>Our itinerary</h2></div>
+      <div class="syncgrid" style="padding-top:0"><a class="big rise itin" style="--i:6" href="itinerary/"><span class="bub" style="--k:#e8452c">${ic('map')}</span><span><b>Day-by-day itinerary</b><span>The full plan with bookings, as one page</span></span></a></div>`;
   }
 };
 
@@ -13487,8 +13532,12 @@ function showPlan(day, p, mode) {
 }
 function liveDone(day, row) { const x = X(day.id, row.it.id); const now = jst().min; if (jst().date === day.date && !row.it.fx && row.it.k !== 'ride' && now > row.start) { const was = row.du; x.du = Math.max(0, now - row.start); x.dn = 1; return x.du < was - 4 ? 'early' : (x.du > was + 4 ? 'late' : null); } x.dn = 1; return null; }
 function bind(v, r) {
+  const af = v.querySelector('[data-add]'); if (af) af.onsubmit = e => { e.preventDefault(); const n = af.n.value.trim(); if (!n) return; const L = shop(); L.push({ id: Date.now().toString(36), n }); store.set(SH, L); refresh(); setTimeout(() => { const i = app.querySelector('.view:last-child [data-add] input'); i && i.focus(); }, 50); };
   v.addEventListener('click', e => {
     const t = e.target.closest('button,a'); if (!t) return;
+    if (t.dataset.buy) return askPrice(t.dataset.buy);
+    if (t.dataset.price) return askPrice(t.dataset.price);
+    if (t.dataset.del) { const L = shop(), x = L.find(y => y.id === t.dataset.del); return confirmSheet('Remove ' + x.n + '?', x.p != null ? 'Its ' + yen(x.p) + ' comes off the total.' : 'It comes off the list.', 'Remove', () => { store.set(SH, L.filter(y => y !== x)); refresh(); }); }
     if (t.matches('[data-back]')) return pushed > 0 ? history.back() : back();
     if (t.dataset.day) return go({ v: 'day', id: t.dataset.day });
     if (t.dataset.item) return go({ v: 'item', id: t.dataset.item });
@@ -13593,13 +13642,32 @@ async function shareLink() {
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { sheet(`<h2>Copy this link</h2><p>Long-press to copy, then send it in the group.</p><div class="tk">${esc(url)}</div>`); }
 }
 
+// ---------- shopping (this phone only)
+const SH = 'kitsune.shop';
+const shop = () => store.get(SH) || [];
+const yen = n => '¥' + Math.round(n).toLocaleString('en-US');
+const INR = 0.60; // rupees per yen, fixed for the trip
+const inr = n => '₹' + Math.round(n * INR).toLocaleString('en-IN');
+function askPrice(id) {
+  const L = shop(), it = L.find(x => x.id === id); if (!it) return;
+  sheet(`<h2>${it.p != null ? 'Change the price' : 'Bought it!'}</h2><p>How much was <b>${esc(it.n)}</b>?</p><form class="priceform"><span>¥</span><input name="p" type="text" inputmode="numeric" pattern="[0-9,]*" placeholder="0" value="${it.p ?? ''}" autocomplete="off"></form><div class="pricehint num" data-inr>${it.p != null ? '≈ ' + inr(it.p) : '≈ ₹0'}</div><div class="actions" style="padding:12px 0 0">${it.p != null ? '<button class="btn" data-unbuy>Not bought</button>' : '<button class="btn" data-no>Cancel</button>'}<button class="btn pri" data-yes>Save</button></div>`, el => {
+    const inp = el.querySelector('input'); setTimeout(() => inp.focus(), 350); const hint = el.querySelector('[data-inr]'); inp.oninput = () => { hint.textContent = '≈ ' + inr(+inp.value.replace(/[^0-9]/g, '') || 0); };
+    const done = () => { const v = +inp.value.replace(/[^0-9]/g, ''); if (!inp.value.trim()) return toast('Enter the price in yen'); it.p = v; it.at = Date.now(); store.set(SH, L); closeSheet(); refresh(); toast(yen(v) + ' added'); };
+    el.querySelector('form').onsubmit = e => { e.preventDefault(); done(); };
+    el.querySelector('[data-yes]').onclick = done;
+    const no = el.querySelector('[data-no]'); if (no) no.onclick = () => closeSheet();
+    const ub = el.querySelector('[data-unbuy]'); if (ub) ub.onclick = () => { delete it.p; delete it.at; store.set(SH, L); closeSheet(); refresh(); };
+  });
+}
+
 // ---------- boot
-document.body.insertAdjacentHTML('beforeend', `<div class="tabs"><nav>${[['home', 'trip', 'Trip', '旅'], ['today', 'sun', 'Today', '今日'], ['wallet', 'wallet', 'Wallet', '券'], ['sync', 'sync', 'Sync', '同期']].map(t => `<button class="tab" data-t="${t[0]}"><span class="ti">${ic(t[1])}</span><span>${t[2]} ${t[3]}</span></button>`).join('')}</nav></div>`);
+document.body.insertAdjacentHTML('beforeend', `<div class="tabs"><nav>${[['home', 'trip', 'Trip', '旅'], ['today', 'sun', 'Today', '今日'], ['wallet', 'wallet', 'Wallet', '券'], ['shop', 'bag', 'Shop', '買'], ['sync', 'sync', 'Sync', '同期']].map(t => `<button class="tab" data-t="${t[0]}"><span class="ti">${ic(t[1])}</span><span>${t[2]} ${t[3]}</span></button>`).join('')}</nav></div>`);
 document.querySelector('.tabs').addEventListener('click', e => {
   const b = e.target.closest('.tab'); if (!b) return; const t = b.dataset.t;
   if (t === 'home') return root('home', { v: 'home' });
   if (t === 'today') { const d = todayDay() || DAYS[DAYS.length - 1]; return root('today', { v: 'day', id: d.id }); }
   if (t === 'wallet') return root('wallet', { v: 'wallet' });
+  if (t === 'shop') return root('shop', { v: 'shop' });
   if (t === 'sync') return root('sync', { v: 'sync' });
 });
 root('home', { v: 'home' });

@@ -1,0 +1,440 @@
+<!doctype html><html lang="en"><head><meta name="theme-color" content="#1f6feb"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Tokyo to Osaka, Day by Day</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#f4f3ee;--paper-2:#eae8e0;--ink:#1d2126;--ink-2:#4c5259;--ink-3:#7b8188;--line:#d6d3c8;
+  --tokyo:#c8322b;--fuji:#2f6f9f;--kyoto:#6b4e9b;--nara:#4f7d3a;--osaka:#1f6f8b;--transit:#8a7b4f;--cut:#9a9a92;
+  --chip-bg:#ffffff;--rail:#cfcbbe;--note-bg:#eceae2;--warn-bg:#f6ead9;--warn:#9a5b12;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#16181b;--paper-2:#1f2226;--ink:#ecebe5;--ink-2:#b8b7ae;--ink-3:#84837b;--line:#33363b;
+  --tokyo:#ef6a5f;--fuji:#7db6e0;--kyoto:#b094e0;--nara:#8fbf78;--osaka:#63b2d0;--transit:#c9b674;--cut:#7c7c74;
+  --chip-bg:#24272b;--rail:#3a3d42;--note-bg:#212429;--warn-bg:#2d2519;--warn:#e0b070;
+}}
+:root[data-theme="dark"]{
+  --paper:#16181b;--paper-2:#1f2226;--ink:#ecebe5;--ink-2:#b8b7ae;--ink-3:#84837b;--line:#33363b;
+  --tokyo:#ef6a5f;--fuji:#7db6e0;--kyoto:#b094e0;--nara:#8fbf78;--osaka:#63b2d0;--transit:#c9b674;--cut:#7c7c74;
+  --chip-bg:#24272b;--rail:#3a3d42;--note-bg:#212429;--warn-bg:#2d2519;--warn:#e0b070;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:15px;line-height:1.55;padding-inline:20px;padding-block:40px 80px}
+.wrap{max-width:900px;margin:0 auto}
+h1,h2,h3,h4{font-family:"Shippori Mincho","Hiragino Mincho ProN",Georgia,serif;font-weight:700;text-wrap:balance;margin:0}
+h1{font-size:2.4rem;line-height:1.1;letter-spacing:-.01em}
+h2{font-size:1.35rem;margin-block:56px 18px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h4{font-size:.95rem;font-family:"IBM Plex Sans",sans-serif;font-weight:600;margin-top:16px;margin-bottom:6px}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.lede{color:var(--ink-2);max-width:66ch;margin-top:14px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.route{display:flex;margin-top:28px;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex-wrap:wrap}
+.route div{flex:1 1 140px;padding:12px 14px;border-left:1px solid var(--line);min-width:0}
+.route div:first-child{border-left:0}
+.route .city{font-family:"Shippori Mincho",serif;font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.route .city::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.route small{display:block;color:var(--ink-3);font-size:.78rem;margin-top:2px}
+.stays{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.stay{border:1px solid var(--line);border-top:3px solid var(--c);border-radius:6px;padding:14px 16px;background:var(--chip-bg)}
+.stay h3{font-size:1.05rem;margin-bottom:2px}
+.stay .when{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--ink-3)}
+.stay dl{margin:10px 0 0;display:grid;grid-template-columns:78px 1fr;gap:4px 10px;font-size:.86rem}
+.stay dt{color:var(--ink-3)}
+.stay dd{margin:0;color:var(--ink-2)}
+.stay dd b{color:var(--ink);font-weight:600}
+.day{display:grid;grid-template-columns:120px 1fr;gap:0 24px;padding-block:30px;border-top:1px solid var(--line);position:relative}
+.day:first-of-type{border-top:0}
+.stamp{position:sticky;top:12px;align-self:start}
+.stamp .d{font-family:"Shippori Mincho",serif;font-size:1.7rem;font-weight:700;line-height:1}
+.stamp .w{color:var(--ink-3);font-size:.8rem;margin-top:2px}
+.stamp .sun{color:var(--ink-3);font-size:.72rem;margin-top:8px;font-family:"IBM Plex Mono",monospace;line-height:1.5}
+.chip{display:inline-block;margin-top:10px;padding:3px 9px;border-radius:999px;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;background:var(--chip-bg);border:1px solid var(--c);color:var(--c)}
+.day h3{font-size:1.15rem;font-weight:700;margin-bottom:4px}
+.day .sub{color:var(--ink-2);font-size:.92rem;margin-bottom:6px;max-width:66ch}
+.base{font-size:.82rem;color:var(--ink-3);margin-bottom:16px}
+.base b{color:var(--ink-2);font-weight:600}
+.slots{display:grid;grid-template-columns:64px 1fr;gap:10px 14px;border-left:2px solid var(--rail);padding-left:14px;margin-left:2px}
+.slots .t{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-3);padding-top:2px;font-variant-numeric:tabular-nums}
+.slots .a{margin:0}
+.slots .a b{font-weight:600}
+.slots .a span{color:var(--ink-2)}
+.slots .a .go{display:block;font-size:.84rem;color:var(--ink-3);margin-top:2px}
+.slots .a .go::before{content:"→ ";color:var(--transit)}
+.slots .a .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tokyo);border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.slots .a .tag.book{color:var(--transit)}
+.slots .a .tag.photo{color:var(--fuji)}
+.slots .a .tag.cash{color:var(--nara)}
+.note{margin-top:14px;background:var(--note-bg);border-radius:6px;padding:10px 14px;font-size:.88rem;color:var(--ink-2);max-width:70ch}
+.note b{color:var(--ink);font-weight:600}
+.warn{background:var(--warn-bg);border-left:3px solid var(--warn)}
+.plan-b{border-left:2px dashed var(--line);padding-left:14px;margin-left:2px;margin-top:14px;font-size:.88rem;color:var(--ink-2);max-width:70ch}
+.plan-b b{color:var(--ink);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
+.item{padding:10px 0;border-bottom:1px solid var(--line)}
+.item b{display:block;font-weight:600}
+.item span{color:var(--ink-2);font-size:.9rem}
+.item .done{color:var(--nara);font-family:"IBM Plex Mono",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tbl{overflow-x:auto}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:.8rem;color:var(--ink-3)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+@media (max-width:640px){
+  .day{grid-template-columns:1fr;gap:10px}
+  .stamp{position:static;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .stamp .chip,.stamp .sun{margin-top:0}
+  .grid2{grid-template-columns:1fr}
+  h1{font-size:1.9rem}
+  .slots{grid-template-columns:52px 1fr}
+}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Oct 19 to Oct 29, 2026 · 10 nights · 4 people · HND in, KIX out · v3.8, all transport booked or decided</div>
+  <h1>Tokyo to Osaka, Day by Day</h1>
+  <p class="lede">Third pass, built around the four bookings. Every day now starts and ends at the actual hotel, with the train lines, walking times and a plan B. Four things changed from v2 because of where the stays landed: Tokyo is on the Oedo line at Wakamatsu-Kawada rather than at Shinjuku station, the Fuji night is a self-catering villa three minutes from Kawaguchiko station (no kaiseki, no lake-view onsen, but the Mishima bus leaves from your doorstep), Kyoto is at Karasuma Gojo with breakfast included, and the Osaka hotel sits between Namba and Shinsekai, closer to Shinsekai.</p>
+
+  <div class="route">
+    <div style="--c:var(--tokyo)"><div class="city">Tokyo</div><small>5 nights · Oct 19 to 24 · BITES by Voyan</small></div>
+    <div style="--c:var(--fuji)"><div class="city">Kawaguchiko</div><small>1 night · Oct 24 · villa near the station</small></div>
+    <div style="--c:var(--kyoto)"><div class="city">Kyoto</div><small>2 nights · Oct 25 to 27 · Smile Hotel Karasuma Gojo</small></div>
+    <div style="--c:var(--nara)"><div class="city">Nara</div><small>stopover · Oct 27 · lockers</small></div>
+    <div style="--c:var(--osaka)"><div class="city">Osaka</div><small>2 nights · Oct 27 to 29 · Centara Life Namba</small></div>
+  </div>
+  <div class="legend"><span><i style="background:var(--tokyo)"></i>From your wishlist</span><span><i style="background:var(--fuji)"></i>Photo spot</span><span><i style="background:var(--transit)"></i>Needs booking</span><span><i style="background:var(--nara)"></i>Cash only</span></div>
+
+  <h2>The stays</h2>
+  <div class="stays">
+    <div class="stay" style="--c:var(--tokyo)">
+      <h3>BITES by Voyan Hotels</h3>
+      <div class="when">Mon Oct 19 → Sat Oct 24 · check-in 16:00, out 11:00</div>
+      <dl>
+        <dt>Address</dt><dd>11-3 Wakamatsucho, Shinjuku-ku, Tokyo 162-0056</dd>
+        <dt>Station</dt><dd><b>Wakamatsu-Kawada (Oedo line E03)</b>, 1 min. Shinjuku station is 4 stops (about 10 min); Tochomae 3 stops.</dd>
+        <dt>Booking</dt><dd>Airbnb, code <span class="mono">HMWBM8HE8Z</span>, 4 guests, paid</dd>
+        <dt>Host</dt><dd>+81 80-1133-9452</dd>
+      </dl>
+    </div>
+    <div class="stay" style="--c:var(--fuji)">
+      <h3>Three-bedroom villa, Funatsu</h3>
+      <div class="when">Sat Oct 24 → Sun Oct 25 · check-in 15:00 to 21:00, out by 10:00</div>
+      <dl>
+        <dt>Address</dt><dd>船津3600-3, Fujikawaguchiko 401-0301 (N 35° 29.780, E 138° 46.252)</dd>
+        <dt>Station</dt><dd><b>Kawaguchiko</b>, 3 min walk. Highway buses and the Fujikyu line leave from here.</dd>
+        <dt>Booking</dt><dd>Booking.com under Anria Joy, 4 adults, ¥42,964 incl. cleaning. No meals. Kitchen, free parking.</dd>
+        <dt>Cancel</dt><dd>Free until <b>Sep 23 23:59</b>, then ¥35,964. Dates cannot be changed.</dd>
+        <dt>Host</dt><dd>+81 80 6591 8869</dd>
+      </dl>
+    </div>
+    <div class="stay" style="--c:var(--kyoto)">
+      <h3>Smile Hotel Kyoto Karasuma Gojo</h3>
+      <div class="when">Sun Oct 25 → Tue Oct 27 · 2 standard double rooms</div>
+      <dl>
+        <dt>Address</dt><dd>396-3 Osakacho, Shimogyo-ku, Kyoto 600-8177</dd>
+        <dt>Station</dt><dd><b>Gojo (Karasuma line K10)</b>, 3 min. Kyoto station is 1 stop. Gion and Pontocho are a 20 min walk east.</dd>
+        <dt>Booking</dt><dd>Agoda ref <span class="mono">26091921569277673</span>, guest ref 2051749277, under Anria Joy, 4 adults, pay-later USD 363.97. <b>Breakfast included.</b> City tax at check-in.</dd>
+        <dt>Cancel</dt><dd>Free until Oct 20</dd>
+        <dt>Phone</dt><dd>+81 75-330-9700</dd>
+      </dl>
+    </div>
+    <div class="stay" style="--c:var(--osaka)">
+      <h3>Centara Life Namba Hotel Osaka</h3>
+      <div class="when">Tue Oct 27 → Thu Oct 29 · 2 standard rooms</div>
+      <dl>
+        <dt>Address</dt><dd>3-4-21 Shikitsuhigashi, Naniwa-ku, Osaka 556-0012</dd>
+        <dt>Station</dt><dd><b>Imamiya-Ebisu (Nankai) 2 min</b>, Daikokucho (Midosuji / Yotsubashi) 5 min, Nankai Namba and Dotonbori 15 to 20 min on foot. Shinsekai 12 min.</dd>
+        <dt>Booking</dt><dd>Agoda ID <span class="mono">2051772929</span> (Booking.com ref 5681349849), under Jovis Joseph. <b>¥39,204 paid at the hotel on Oct 27</b>, plus city tax. Photo ID with address needed at check-in.</dd>
+        <dt>Cancel</dt><dd>Free until Oct 24</dd>
+        <dt>Phone</dt><dd>+81 6-6556-6908</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="note warn" style="max-width:none"><b>Two things to fix on the bookings before you fly.</b> The Osaka confirmation says 2 adults across 2 rooms; message the hotel to register 4 guests so nobody is turned away at the desk. And the Kyoto and Fuji bookings are under Anria's name, Osaka under yours; whoever is named should be the one who walks up to check in, with ID.</div>
+
+  <h2>Day by day</h2>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--tokyo)"><div class="d">Oct 19</div><div class="w">Monday</div><span class="chip">Tokyo · arrival</span><div class="sun">sunset 16:51</div></div>
+    <div>
+      <h3>Land, one change to the hotel, Shinjuku by night</h3>
+      <p class="sub">The hotel is on the Oedo line, and so is Daimon, which the Keikyu airport train runs straight into. One change with bags, no Shinjuku station scrum.</p>
+      <div class="base"><b>Base:</b> BITES by Voyan, Wakamatsu-Kawada · check-in from 16:00</div>
+      <div class="slots">
+        <div class="t">15:05</div><p class="a"><b>Arrive HND, Terminal 3, on Vietnam Airlines VN384 from Hanoi</b> <span>Immigration and bags, allow 60 to 90 min. Before leaving the terminal: pick up yen at the ATM (7-Bank in the arrivals hall), buy a Welcome Suica each from the machine with cash and load ¥5,000, and turn on the eSIM.</span></p>
+        <div class="t">16:45</div><p class="a"><b>Keikyu Airport line to Daimon, Oedo line to Wakamatsu-Kawada</b> <span>Take any Keikyu train marked for the Asakusa line (they run through), get off at Daimon (about 25 min), follow signs to the Oedo line, then ride towards Tochomae / Hikarigaoka. Wakamatsu-Kawada is 12 stops on, about 30 min. Door to door 1 hour, roughly ¥900 each. Taxi is about ¥9,000 if everyone is wrecked.</span><span class="go">Elevators at Daimon are at the far end of the Keikyu platform, worth the extra walk with four bags.</span></p>
+        <div class="t">17:45</div><p class="a"><b>Check in, drop bags, 30 min to reset.</b></p>
+        <div class="t">18:30</div><p class="a"><b>Tokyo Metropolitan Government Building, south observatory</b><span class="tag">list</span> <span>Oedo line 3 stops to Tochomae, the building is above the station. Free, last entry 21:30. Fuji is not visible after dark, but the west Tokyo grid is.</span></p>
+        <div class="t">19:45</div><p class="a"><b>Omoide Yokocho</b><span class="tag">list</span><span class="tag cash">cash</span> <span>Walk 8 min east under the tracks to the west exit. Yakitori counters, six to eight seats each; split into two pairs if nothing seats four. Budget ¥2,500 to 3,500 a head with drinks.</span></p>
+        <div class="t">21:00</div><p class="a"><b>Kabukicho, then Golden Gai</b><span class="tag">list</span><span class="tag cash">cash</span> <span>Cross under the tracks, through the Kabukicho gate to the Godzilla head on Hotel Gracery, then 5 min east into Golden Gai. Pick bars with "no cover charge" or the price on the door; ¥500 to 1,000 cover is normal elsewhere.</span></p>
+        <div class="t">23:00</div><p class="a"><b>Home.</b> <span>Golden Gai to the hotel is a 20 min walk north up Meiji-dori, or Higashi-Shinjuku station (8 min) and one Oedo stop. Last Oedo trains around 00:20.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--tokyo)"><div class="d">Oct 20</div><div class="w">Tuesday</div><span class="chip">Tokyo · palace to river</span><div class="sun">sunrise 05:51<br>sunset 16:50</div></div>
+    <div>
+      <h3>Imperial gardens, Yasukuni, Akihabara, Asakusa after dark</h3>
+      <p class="sub">Everything today is on or near a straight line east from the hotel, and the Oedo to Tozai change at Iidabashi puts you at the palace gate in under half an hour.</p>
+      <div class="base"><b>Base:</b> BITES by Voyan · breakfast at the Lawson by the station or the bakery on Okubo-dori</div>
+      <div class="slots">
+        <div class="t">08:30</div><p class="a"><b>Oedo line to Iidabashi (3 stops), Tozai line to Otemachi (3 stops)</b> <span>About 25 min. Otemachi exit C13a puts you at the moat; Otemon gate is across the bridge.</span></p>
+        <div class="t">09:00</div><p class="a"><b>Imperial Palace East Gardens</b><span class="tag">list</span> <span>Gates open 09:00, free, take a plastic token at the gate and return it on exit. Route: Otemon, the guardhouses, up the ramp to the Honmaru lawn and the keep foundation, then down into Ninomaru garden. 90 min.</span></p>
+        <div class="t">10:45</div><p class="a"><b>Chidorigafuchi</b><span class="tag">list</span> <span>Exit via Kitahanebashimon, walk 10 min north along the moat. Rowing boats ¥800 per 30 min if the water is calm; the moat path itself is the point in October.</span></p>
+        <div class="t">11:30</div><p class="a"><b>Yasukuni Shrine</b><span class="tag">list</span> <span>Across Yasukuni-dori at the top of the moat. The great torii, the main hall, 40 min. Skip the Yushukan museum.</span></p>
+        <div class="t">12:30</div><p class="a"><b>Lunch in Jimbocho</b> <span>Kudanshita to Jimbocho is one stop on the Hanzomon line or a 12 min walk. Curry: Bondy (queues, worth it), Kyoeido, or Ethiopia. Then a browse along Yasukuni-dori's secondhand bookshops if anyone wants.</span></p>
+        <div class="t">14:00</div><p class="a"><b>Akihabara</b><span class="tag">list</span> <span>Walk 20 min east along Yasukuni-dori and Kuramaebashi-dori, or Shinjuku line Jimbocho to Iwamotocho and walk 5 min. Circuit: Radio Kaikan (10 floors of figures and cards), Mandarake (8 floors, vintage), Super Potato (retro games, top floor arcade), Yodobashi Akiba if anyone needs a camera or electronics. Tax-free with passports.</span></p>
+        <div class="t">16:30</div><p class="a"><b>Ginza line from Suehirocho to Asakusa</b> <span>Suehirocho is 5 min from the Akihabara main crossing; 6 stops, 12 min.</span></p>
+        <div class="t">16:50</div><p class="a"><b>Senso-ji at dusk</b><span class="tag">list</span> <span>Through Kaminarimon while there is still light, up Nakamise before the shutters (the painted ones come down around 18:00), Hozomon, the main hall and the five-storey pagoda lit up. The grounds stay open until 23:00. Incense at the cauldron, omikuji for ¥100.</span></p>
+        <div class="t">17:45</div><p class="a"><b>Sumida Park and Azuma Bridge</b><span class="tag">list</span><span class="tag photo">photo</span> <span>5 min walk east. Skytree lit, the Asahi flame in the frame from the bridge. Then 10 min east across the river to Jikken Bridge for the canal reflection shot.</span></p>
+        <div class="t">19:00</div><p class="a"><b>Dinner in Asakusa</b><span class="tag cash">cash</span> <span>Hoppy Street (west of Senso-ji) for beef stew and hoppy at outdoor tables, or Daikokuya for tendon if the queue is short. Sometaro for cook-it-yourself okonomiyaki on tatami is the group option.</span></p>
+        <div class="t">21:00</div><p class="a"><b>Home.</b> <span>Asakusa line one stop to Kuramae, walk 6 min to the Oedo Kuramae station (they are separate), Oedo 8 stops to Wakamatsu-Kawada. About 35 min. Or Ginza line to Ueno and Oedo from Ueno-Okachimachi, similar time.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--tokyo)"><div class="d">Oct 21</div><div class="w">Wednesday</div><span class="chip">Tokyo · west</span><div class="sun">sunset 16:49</div></div>
+    <div>
+      <h3>Meiji Jingu, Harajuku, Omotesando, sunset over Shibuya, the crossing after dark</h3>
+      <p class="sub">Shibuya Sky sold out, so the sunset moves to Hikarie's free 11th-floor lobby and the crossing is seen from Mag's Park as the lights come on. No timed ticket means a slower afternoon. Shibuya to the hotel is one train on the Fukutoshin line.</p>
+      <div class="base"><b>Base:</b> BITES by Voyan</div>
+      <div class="slots">
+        <div class="t">07:50</div><p class="a"><b>Oedo line to Shinjuku (via Tochomae), collect the Fuji Excursion tickets</b><span class="tag book">pickup</span> <span>Get off at Shinjuku (E27), not Yoyogi. At any JR East reserved-seat ticket machine by the JR gates: scan the QR from the Eki-net email, or enter pickup code <span class="mono">20422491937521288</span> with the VISA ending 1356. It prints 8 tickets (fare + express per person). Then Yamanote 1 stop to Harajuku. If this is missed, tomorrow's Keio trip through Shinjuku is the second chance.</span></p>
+        <div class="t">08:10</div><p class="a"><b>Yamanote 1 stop to Harajuku</b> <span>Harajuku's west exit is the shrine entrance.</span></p>
+        <div class="t">08:30</div><p class="a"><b>Meiji Jingu</b><span class="tag">list</span> <span>Through the big cypress torii, the sake barrel wall, the main shrine. Quiet before 09:30. If someone wants the inner garden it is ¥500 and adds 30 min. Write an ema, bow twice, clap twice, bow once.</span></p>
+        <div class="t">10:15</div><p class="a"><b>Takeshita Dori</b><span class="tag">list</span> <span>Straight out of the station's Takeshita exit. Shops open 10:00 to 11:00, so early is empty and late is a crush. Crepes at Marion, 20 min end to end.</span></p>
+        <div class="t">11:15</div><p class="a"><b>Omotesando and Cat Street, lunch</b><span class="tag">list</span> <span>Down the avenue past the flagships (Tokyu Plaza's mirror escalator, Omotesando Hills), then Cat Street south. Lunch: Harajuku Gyoza Lou (cheap, fast), Afuri for yuzu ramen, or Luke's Lobster on Cat Street. Kiddy Land for anyone buying gifts.</span></p>
+        <div class="t">13:45</div><p class="a"><b>Cat Street into Shibuya</b> <span>Miyashita Park (the free rooftop park and the shops below), then Shibuya Parco: the Nintendo and Pokemon stores on 6F, the basement food floor. Hachiko in daylight for a first look at the crossing.</span></p>
+        <div class="t">15:30</div><p class="a"><b>Shibuya shopping and coffee</b> <span>Shibuya 109, Tower Records (seven floors), or the Scramble Square shopping floors. Coffee break before the sunset; Fuglen or Streamer are close.</span></p>
+        <div class="t">16:20</div><p class="a"><b>Sunset from Shibuya Hikarie 11F</b><span class="tag photo">photo</span> <span>Free. Hikarie is on the east side of the station, connected underground; take the lifts to 11F (Sky Lobby). The windows face west over the station and Scramble Square, so the sun drops behind the skyline at 16:49, and on a clear day Fuji shows as a silhouette. Stay until the towers light up.</span></p>
+        <div class="t">17:15</div><p class="a"><b>Mag's Park rooftop, the crossing from above</b><span class="tag">list</span><span class="tag photo">photo</span> <span>Top of Magnet by Shibuya109, right over the crossing. Small entry fee, pay on the spot. Blue hour here is the shot Shibuya Sky would have given you, just lower.</span></p>
+        <div class="t">17:45</div><p class="a"><b>Shibuya Crossing in the dark</b><span class="tag">list</span><span class="tag photo">photo</span> <span>Cross it a few times. The Scramble Square 2F window at the top of the escalators is a free second angle.</span></p>
+        <div class="t">19:00</div><p class="a"><b>Dinner and evening in Shibuya</b><span class="tag cash">cash</span> <span>Nonbei Yokocho (two alleys beside the tracks, tiny bars, Golden Gai feel), or Center Gai for izakaya chains with English menus. Uobei for conveyor sushi if the group wants something cheap and fast.</span></p>
+        <div class="t">21:30</div><p class="a"><b>Home.</b> <span>Fukutoshin line from Shibuya to Higashi-Shinjuku direct, 10 min, then 1 Oedo stop or a 10 min walk. Tonight: open the teamLab ticket page, the 2D code is live from 18:30; screenshot it for tomorrow.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--tokyo)"><div class="d">Oct 22</div><div class="w">Thursday</div><span class="chip">Tokyo · last city day</span><div class="sun">sunset 16:48</div></div>
+    <div>
+      <h3>Jindaiji, the cat tram to Gotokuji, Itoya, Tokyo Tower at dusk, teamLab</h3>
+      <p class="sub">The three must-sees are the afternoon and evening. The two good-to-haves fit before them because the Setagaya line's Manekineko tram stops at Miyanosaka, five minutes from Gotokuji, and Jindaiji is one Keio ride further out.</p>
+      <div class="base"><b>Base:</b> BITES by Voyan</div>
+      <div class="slots">
+        <div class="t">08:15</div><p class="a"><b>Oedo line to Shinjuku, Keio line to Chofu</b> <span>If the Fuji Excursion tickets were not collected yesterday, do it now at a JR East machine before heading to Keio (QR or pickup code 20422491937521288, VISA 1356). Keio's Shinjuku station is under the JR south side. Special express to Chofu is 15 to 20 min. From Chofu north exit, bus stop 14, Keio bus to "Jindaiji" (about 15 min), or a ¥1,500 taxi.</span></p>
+        <div class="t">09:15</div><p class="a"><b>Jindaiji</b><span class="tag">list</span> <span>Tokyo's second oldest temple, thatched soba houses and a stream along the approach, the Jindai Botanical Garden behind it if there is time. Soba shops open around 10:30 to 11:00: Yusui or Matsuba for an early lunch.</span></p>
+        <div class="t">11:45</div><p class="a"><b>Bus back to Chofu, Keio to Shimotakaido, Setagaya line to Miyanosaka</b> <span>Chofu to Shimotakaido about 12 min on a local. The Setagaya line is a two-car tram, ¥160 flat, 5 stops to Miyanosaka. Tokyu posts which runs the Manekineko-wrapped car each day; ask at the Shimotakaido booth.</span></p>
+        <div class="t">12:45</div><p class="a"><b>Gotokuji</b><span class="tag">list</span> <span>5 min from Miyanosaka. The lucky cat temple; the cat shelf is beside the three-storey pagoda. Small cats from ¥500 at the office, cash. 40 min.</span></p>
+        <div class="t">13:45</div><p class="a"><b>Setagaya line to Sangen-jaya, Hanzomon line to Shibuya, Ginza line to Ginza</b> <span>About 40 min. Use exit A2 for Chuo-dori.</span></p>
+        <div class="t">14:30</div><p class="a"><b>Itoya, Ginza</b><span class="tag">list</span> <span>Ginza 2-7-15, the red paperclip sign. 12 floors, pens on 3, paper on 7, the cafe on 12. Ginza Six and Uniqlo Ginza (12 floors) are 5 min away if anyone splits off. 90 min.</span></p>
+        <div class="t">16:10</div><p class="a"><b>Hibiya line Ginza to Kamiyacho</b> <span>4 stops, 8 min. Exit 1, walk 7 min to the Tower.</span></p>
+        <div class="t">16:25</div><p class="a"><b>Tokyo Tower</b><span class="tag">list</span><span class="tag photo">photo</span> <span>Main deck (150 m, ¥1,500) in daylight, stay through sunset; the tower lights come on around 17:00. Exterior shots after: Shiba Park lawn, and Zojoji temple's main gate framing the tower, 5 min walk.</span></p>
+        <div class="t">18:30</div><p class="a"><b>Walk to Azabudai Hills</b> <span>8 min north. Grab a quick bite in the Azabudai Hills Market basement before going in.</span></p>
+        <div class="t">18:45</div><p class="a"><b>teamLab Borderless</b><span class="tag">list</span><span class="tag book">booked</span> <span>Entry window 18:30 to 19:00, ticket <span class="mono">ANMHLYARAMPT-0001</span>, 4 adults, paid. The 2D code appears on the teamLab ticket page from 24 hours before (from 18:30 on Oct 21); open it on the phone and screenshot it. No re-entry, so toilets and a snack before scanning in. Wear light colours (they take projections), no heels (the Athletics rooms), and download the app for the rooms that respond to it.</span></p>
+        <div class="t">21:00</div><p class="a"><b>Dinner in Azabudai Hills, then home.</b> <span>Oedo line from Akabanebashi (8 min walk) direct to Wakamatsu-Kawada via Tochomae, about 30 min.</span></p>
+      </div>
+      <div class="plan-b"><b>Plan B if the morning runs long:</b> drop Jindaiji, go straight to Gotokuji via Shinjuku, Odakyu to Gotokuji station (15 min, then 10 min walk). Everything from Itoya on is fixed by the teamLab slot.</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--tokyo)"><div class="d">Oct 23</div><div class="w">Friday</div><span class="chip">Day trip · Nikko</span><div class="sun">Nikko sunset 16:53</div></div>
+    <div>
+      <h3>Nikko on a guided coach tour</h3>
+      <p class="sub">Booked on Klook: the Nikko Toshogu &amp; Lake Chuzenji autumn tour, from Shinjuku at 07:30, back in Shinjuku around 18:30. The coach drives Irohazaka, stops at Kegon Falls and Lake Chuzenji in the morning while the views are clearest, then Shinkyo Bridge and two hours at Toshogu. Stop times below are approximate; the guide sets them on the day.</p>
+      <div class="base"><b>Base:</b> BITES by Voyan · Klook booking <span class="mono">XRX118970</span>, voucher <span class="mono">KLK5727023048</span>, 4 adults, lead Jovis</div>
+      <div class="slots">
+        <div class="t">06:50</div><p class="a"><b>Leave the hotel, Oedo line to Shinjuku</b> <span>Via Tochomae, about 10 min. Buy onigiri, snacks and drinks at the station Lawson or FamilyMart: lunch is not included and the listing recommends bringing some.</span></p>
+        <div class="t">07:20</div><p class="a"><b>Meet at Starbucks, Shinjuku Maynds Tower 1F</b><span class="tag book">booked</span> <span>Yoyogi 2-1-1, a 5 min walk south from Shinjuku station's South / New South exit. Be there 10 min early; latecomers forfeit the booking. Coach leaves at 07:30. Show the Klook voucher on the phone.</span></p>
+        <div class="t">10:30</div><p class="a"><b>Irohazaka drive</b><span class="tag photo">photo</span> <span>No stop; the 48 hairpins and the valley colour from the coach window. Sit on the left going up if you can.</span></p>
+        <div class="t">10:45</div><p class="a"><b>Kegon Falls and Lake Chuzenji, about 1.5 hrs</b> <span>Kegon's lift to the base platform is about ¥600, cash; the free upper viewpoint is fine if the queue is long. Then the lakeshore. Eat here: yuba soba or grilled lake trout from the shore-road shops, or the snacks you brought. Watch the clock, the coach won't wait.</span></p>
+        <div class="t">12:30</div><p class="a"><b>Shinkyo Bridge, 20 min</b> <span>The red bridge over the Daiya river; the best photo is from the road bridge beside it.</span></p>
+        <div class="t">13:00</div><p class="a"><b>Toshogu, about 2 hrs</b> <span>Entry not included: about ¥1,600 each, cash. Look for the three monkeys on the sacred stable, the Yomeimon gate, the sleeping cat over the gate to Ieyasu's tomb (207 steps up), and the crying dragon ceiling in Honjido, where a monk claps and the dragon "cries" back. Rinno-ji is optional if time allows.</span></p>
+        <div class="t">15:15</div><p class="a"><b>Coach back to Tokyo</b> <span>About 3 hrs; Friday evening traffic can add more. Nap time.</span></p>
+        <div class="t">18:30</div><p class="a"><b>Drop-off at Shinjuku Maynds Tower</b> <span>Stay on for Shinjuku; the coach continues to Tokyo Station (19:00), which you don't want. Dinner in Shinjuku, then Oedo line home.</span></p>
+        <div class="t">20:30</div><p class="a"><b>Home, pack.</b> <span>Big bags to the 7-Eleven if not already done, overnight bag for Fuji, chargers. Check the 8 Fuji Excursion tickets are in the bag, two per person. Tomorrow leaves at 06:40.</span></p>
+      </div>
+      <div class="note"><b>Day before (Oct 22):</b> the operator emails between 15:00 and 17:00 Japan time with the guide details and a link to a group chat. Check spam if it doesn't arrive. Free cancellation until 07:00 on Oct 22 (Japan time) if a typhoon is forecast.</div>
+      <div class="note"><b>Luggage, the honest version:</b> the Tokyo hotel is a small aparthotel and may not run a takkyubin desk. Ask the host on Oct 22. If not, any 7-Eleven or FamilyMart takes Yamato takkyubin: drop the big bags on the evening of Oct 23 (or before 07:00 on the 24th), addressed to Smile Hotel Kyoto Karasuma Gojo, 396-3 Osakacho, Shimogyo-ku, Kyoto 600-8177, with "guest Anria Joy, arriving Oct 25" on the slip. About ¥2,500 a bag, Tokyo to Kyoto is next-day. Call the Kyoto hotel once (+81 75-330-9700) to say four bags are coming.</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--fuji)"><div class="d">Oct 24</div><div class="w">Saturday</div><span class="chip">Fuji Five Lakes · overnight</span><div class="sun">sunset 16:53</div></div>
+    <div>
+      <h3>Chureito Pagoda, Fujiyoshida, Oshino Hakkai, Oishi Park, villa by the station</h3>
+      <p class="sub">The villa is in Funatsu, three minutes from Kawaguchiko station, so the end of the day is simple: every bus comes back to the station. What you lose against the v2 plan is the kaiseki and the bath facing the mountain; what you gain is a kitchen, three bedrooms, and no dawn taxi tomorrow.</p>
+      <div class="base"><b>Base:</b> Funatsu villa · check-in 15:00 to 21:00 · Kawaguchiko station 3 min</div>
+      <div class="slots">
+        <div class="t">06:40</div><p class="a"><b>Check out, Oedo line to Shinjuku</b> <span>Via Tochomae, about 10 min. Fuji Excursion leaves from the JR platforms 5/6 on the south side, allow 10 min to find them.</span></p>
+        <div class="t">07:30</div><p class="a"><b>Fuji Excursion 3, Shinjuku to Shimoyoshida, arrives 09:11</b><span class="tag book">booked</span> <span>Reservation <span class="mono">E86263</span>, Car 1, seats 6C, 6D, 7C, 7D. Paper tickets already collected (two per person: insert both into the gate together, keep both, hand them in at Shimoyoshida). Fallback if the train is missed: Fujikyu highway bus from Busta Shinjuku (4F, above the south exit) to Kawaguchiko, 2 hours, then one stop back on the Fujikyu line to Shimoyoshida.</span></p>
+        <div class="t">09:25</div><p class="a"><b>Chureito Pagoda</b><span class="tag photo">photo</span> <span>10 min walk from Shimoyoshida to Arakura Sengen shrine, then 398 steps. Pagoda, Fuji, and the first maples. This is the photo; do it before the light goes flat and the clouds build.</span></p>
+        <div class="t">11:00</div><p class="a"><b>Honcho Street, Fujiyoshida</b><span class="tag photo">photo</span> <span>Walk 10 min or one stop to Gekkoji. The old shopping street with Fuji filling the end of it. Hoto lunch at Hoto Fudo's Fujiyoshida branch or one of the small places on the street; ¥1,200 to 1,500 a bowl.</span></p>
+        <div class="t">13:00</div><p class="a"><b>Bus to Oshino Hakkai</b> <span>Fujikyu bus from Fujisan station (one stop from Shimoyoshida, or 15 min walk), about 25 min. Eight spring ponds, thatched roofs, Fuji behind. One hour. Skip the paid "village" pond; the free ones are the good ones.</span></p>
+        <div class="t">14:45</div><p class="a"><b>Bus to Kawaguchiko station, then the Red Line bus to Oishi Park</b> <span>Oshino to Kawaguchiko about 30 min, Red Line loop bus 25 min to Oishi Koen. A 2-day Red/Green line pass is ¥1,500 and covers tomorrow's ropeway hop too. A taxi from Oshino straight to Oishi is 25 min and about ¥5,000 if the bus timing is bad.</span></p>
+        <div class="t">15:45</div><p class="a"><b>Oishi Park, north shore</b><span class="tag photo">photo</span> <span>Lake, Fuji, and the kochia bushes turning red in late October. The cafe on the lawn does a Fuji-shaped soft serve. Stay until the light goes around 16:40.</span></p>
+        <div class="t">17:00</div><p class="a"><b>Red Line bus back to Kawaguchiko station, check in</b> <span>25 min. Villa is 3 min from the station. Free parking, kitchen, so stop at the supermarket for breakfast things and beer.</span></p>
+        <div class="t">18:30</div><p class="a"><b>Dinner near the station</b> <span>Hoto Fudo (station-front branch) closes early, order by 19:00. Kosaku is 10 min on foot and does hoto and horse sashimi. Tenka Chaya is the other hoto place in Funatsu. All cash-friendly, none take reservations.</span></p>
+        <div class="t">20:30</div><p class="a"><b>Onsen, optional</b> <span>The villa has a bath but no onsen. Fuji Yurari in Narusawa has 16 baths facing Fuji and is open until 21:00 (last entry 20:00), 15 min by taxi. Only worth it if you go straight from dinner.</span></p>
+      </div>
+      <div class="note"><b>Cloud rule:</b> late October is the clearest month, and even so Fuji tends to be out at dawn and gone by early afternoon. Chureito at 09:30 and Oishi at 16:00 are the two windows this day; if it clouds over at Oishi, tomorrow's sunrise is the backup and is usually the better of the two anyway.</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--transit)"><div class="d">Oct 25</div><div class="w">Sunday</div><span class="chip">Fuji → Kyoto</span><div class="sun">sunrise 06:00<br>Kyoto sunset 17:11</div></div>
+    <div>
+      <h3>Fuji at sunrise, the bus to Mishima, the Shinkansen to Kyoto</h3>
+      <p class="sub">The Mishima bus leaves from the bus stops in front of Kawaguchiko station, three minutes from the villa. Checkout is 10:00, which is exactly the constraint that makes the 10:40 bus the right one.</p>
+      <div class="base"><b>Base:</b> Funatsu villa until 10:00 → Smile Hotel Kyoto Karasuma Gojo from about 15:30</div>
+      <div class="slots">
+        <div class="t">05:45</div><p class="a"><b>Walk to the lakeshore</b><span class="tag photo">photo</span> <span>12 min north from the villa to the shore by Kawaguchiko Ohashi bridge, or the lawn by the ropeway base. Sun is up at 06:00 and Fuji goes pink for about ten minutes. Layers: it will be around 5°C.</span></p>
+        <div class="t">07:00</div><p class="a"><b>Breakfast at the villa, pack, tidy.</b> <span>Kitchen means you can do coffee and eggs; the cleaning fee is already paid, but leave it decent.</span></p>
+        <div class="t">09:00</div><p class="a"><b>Check out, bags into station lockers, Fuji Panoramic Ropeway (optional)</b> <span>The ropeway is 10 min from the station and opens 09:00; up and down with the view is 45 min. Only if Fuji is clear. Otherwise coffee at the station. Back at the station and bags out of the lockers by 10:40.</span></p>
+        <div class="t">10:55</div><p class="a"><b>Fujikyu bus 0174, Kawaguchiko station bay 6 to Mishima station north exit, arrives 12:25</b><span class="tag book">booked</span> <span>Reservation <span class="mono">2966511</span> under Abel, 4 seats. The QR is on the Fujiyama Connect booking page on Abel's phone (screenshots are blocked, so open the live page and show it to the driver). Be at bay 6 by 10:45. Stay on past the south exit; the north exit is the Shinkansen side.</span></p>
+        <div class="t">12:30</div><p class="a"><b>Lunch at Mishima</b> <span>80 minutes before the train. Mishima's speciality is eel: Sakuraya (5 min from the south exit) is the famous one but queues an hour; Unayoshi and the other eel places on the south-exit street are faster. Or ekiben from the Shinkansen concourse and eat on board with Fuji out of the window.</span></p>
+        <div class="t">13:46</div><p class="a"><b>Hikari 713, Mishima to Kyoto, arrives 15:37</b><span class="tag book">booked</span> <span>SmartEX reservation <span class="mono">2000</span>, Car 12, seats 13D, 13E, 14D, 14E, ¥45,240 paid on the VISA ending 1356. Boarding: each person scans their own QR-Ticket (from the SmartEX email or My Trips) at the Shinkansen gate's QR reader; no pickup, nothing to show on board. The Shinkansen gates at Mishima are separate from the local-line gates, follow the blue signs from the north exit. E seats are the window, Fuji is on that side for the first 10 minutes.</span></p>
+        <div class="t">15:40</div><p class="a"><b>Kyoto station, Karasuma line one stop to Gojo</b> <span>Follow signs down to the subway (Karasuma line, towards Kokusaikaikan), Suica ¥220. Exit 8, hotel is a 3 min walk. Bags from Tokyo should be at the desk.</span></p>
+        <div class="t">16:00</div><p class="a"><b>Check in, drop bags.</b> <span>Two doubles. Breakfast is included tomorrow and Tuesday, ask what time it starts (usually 06:30, which matters for Fushimi Inari).</span></p>
+        <div class="t">16:45</div><p class="a"><b>Walk east to Gion</b> <span>20 min along Gojo-dori and across the river, or bus 5 from Karasuma Gojo to Gion. Kennin-ji's back lanes, Hanamikoji as the lanterns come on, Shirakawa canal by the willows, Yasaka Shrine at dusk with the lanterns lit.</span></p>
+        <div class="t">19:00</div><p class="a"><b>Dinner on Pontocho</b><span class="tag book">book</span> <span>The lane between Shijo and Sanjo west of the river. Book two weeks ahead; kaiseki places are small. For something looser, Kiyamachi one street over has izakaya that take walk-ins.</span></p>
+        <div class="t">21:30</div><p class="a"><b>Home.</b> <span>Walk 20 min south-west, or Hankyu Kyoto-Kawaramachi to Karasuma (1 stop) and the Karasuma line 1 stop to Gojo.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--kyoto)"><div class="d">Oct 26</div><div class="w">Monday</div><span class="chip">Kyoto · full day</span><div class="sun">sunrise 06:11<br>sunset 17:10</div></div>
+    <div>
+      <h3>Fushimi Inari at dawn, Kinkaku-ji, Kiyomizu and Higashiyama, Gion at night</h3>
+      <p class="sub">The day that justifies two Kyoto nights. Taxis between the three big sights keep it moving; split four ways they cost less than the time. Kyoto station is one stop away, which is why Fushimi Inari and tomorrow's Arashiyama both start there.</p>
+      <div class="base"><b>Base:</b> Smile Hotel · breakfast included, or skip it and eat in Fushimi</div>
+      <div class="slots">
+        <div class="t">06:30</div><p class="a"><b>Karasuma line to Kyoto station, JR Nara line to Inari</b> <span>2 stops on the JR local, 5 min, ¥150. The shrine gate is across the road from the station.</span></p>
+        <div class="t">07:00</div><p class="a"><b>Fushimi Inari</b><span class="tag photo">photo</span> <span>Main hall, then up through Senbon Torii. Go to the Yotsutsuji viewpoint (about 40 min up) and back; the torii are empty enough for photos until about 08:30. Skip the full summit loop. Inari sushi and a coffee at the stalls on the way down.</span></p>
+        <div class="t">09:30</div><p class="a"><b>Taxi to Kinkaku-ji</b> <span>Across town, 35 to 40 min, about ¥4,500. Faster than any train combination.</span></p>
+        <div class="t">10:15</div><p class="a"><b>Kinkaku-ji</b> <span>¥500, a one-way loop past the pavilion and the pond, up through the gardens to the tea house. Best in morning light on the water. 45 min. Ryoan-ji's rock garden is 15 min walk away if the group is ahead of schedule.</span></p>
+        <div class="t">11:15</div><p class="a"><b>Taxi to Kiyomizu-dera</b> <span>30 min, about ¥3,500. Ask for the Chawan-zaka drop-off.</span></p>
+        <div class="t">11:50</div><p class="a"><b>Kiyomizu-dera</b> <span>¥500. The main hall stage over the valley, Jishu shrine, the Otowa waterfall's three streams (pick one). The pagoda view from the Okunoin hall is the photo. One hour.</span></p>
+        <div class="t">13:00</div><p class="a"><b>Sannenzaka and Ninenzaka, lunch</b><span class="tag photo">photo</span> <span>Down the stone steps and preserved lanes. Lunch at one of the yudofu places or the Starbucks in the machiya on Ninenzaka for the novelty. Yasaka Pagoda from the bottom of the lane is the second photo. Kodai-ji if anyone wants one more temple.</span></p>
+        <div class="t">15:15</div><p class="a"><b>Maruyama Park, then Nishiki Market</b> <span>Through the park behind Yasaka, then bus 201 or a 20 min walk west across the river to Nishiki. Market stalls close around 17:00 to 18:00, so graze now: tamagoyaki, tako tamago, sesame ice cream. Teramachi and Shinkyogoku arcades for shopping.</span></p>
+        <div class="t">17:30</div><p class="a"><b>Kamo riverbank at dusk</b> <span>Sit on the bank at Sanjo like everyone else. Sunset 17:10.</span></p>
+        <div class="t">18:30</div><p class="a"><b>Dinner and Gion after dark</b> <span>Second night here, so try the other side: Miyagawacho (the quieter geisha district south of Shijo), then bars along Kiyamachi. Gion Duck Noodles is small and worth the wait; Yakitori Hitomi on Kiyamachi for a group table.</span></p>
+        <div class="t">21:30</div><p class="a"><b>Home.</b> <span>Walk 20 min or a ¥1,000 taxi. Pack tonight; tomorrow is check out, Arashiyama, and three trains.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--nara)"><div class="d">Oct 27</div><div class="w">Tuesday</div><span class="chip">Kyoto → Nara → Osaka</span><div class="sun">sunrise 06:12<br>Osaka sunset 17:12</div></div>
+    <div>
+      <h3>Arashiyama early, the Aoniyoshi to Nara, deer and Todai-ji, the Kintetsu express to Namba</h3>
+      <p class="sub">The 12:55 Aoniyoshi gives Arashiyama a proper morning, a calm checkout, and puts you in Nara at 13:28 with four hours of daylight. The evening leg to Osaka is the plain Kintetsu Rapid Express on Suica: no booking, more room for bags, and no fixed departure time.</p>
+      <div class="base"><b>Base:</b> Smile Hotel until checkout → Centara Life Namba from about 18:45</div>
+      <div class="slots">
+        <div class="t">07:00</div><p class="a"><b>Breakfast at the hotel, Karasuma line to Kyoto station, JR Sagano line to Saga-Arashiyama</b> <span>15 min on the Sagano line. Leave the bags at the hotel desk.</span></p>
+        <div class="t">07:45</div><p class="a"><b>Arashiyama bamboo grove</b><span class="tag photo">photo</span> <span>10 min walk from the station. Empty enough until about 08:45. Walk through to the Okochi Sanso gate and back.</span></p>
+        <div class="t">08:45</div><p class="a"><b>Tenryu-ji garden, Togetsukyo bridge</b> <span>Garden-only ticket ¥500, the pond with the hills behind is the view. Then down to the river and across Togetsukyo; the maples on the hillside are starting. Coffee at % Arabica on the riverbank.</span></p>
+        <div class="t">10:15</div><p class="a"><b>JR back to Kyoto station, Karasuma line to Gojo, check out</b> <span>At the hotel by 10:50. Check out, collect bags.</span></p>
+        <div class="t">11:30</div><p class="a"><b>Back to Kyoto station, early lunch, find the Kintetsu platforms</b> <span>Kintetsu Kyoto is at the south side of the JR station, past the Shinkansen gates. Lunch in Porta underground or the ramen floor of the Isetan building (10F, Kyoto Ramen Koji). Be on the Kintetsu platform by 12:40.</span></p>
+        <div class="t">12:55</div><p class="a"><b>Aoniyoshi, Kyoto (platform 1) to Kintetsu-Nara, arrives 13:28</b><span class="tag book">booked</span> <span>Train 9207, Car 4, twin seats 7A/7B (Abel's booking <span class="mono">A28669</span>) and 7C/7D (Jovis's booking <span class="mono">A41252</span>). Base fare is not included: everyone taps Suica at the Kintetsu gate (about ¥760 each). Saved screenshots are not accepted on board; Abel and Jovis each open the live e-ticket from "Review/refund/change of purchased ticket(s)" on the Kintetsu site if a conductor asks, so stay logged in.</span></p>
+        <div class="t">13:30</div><p class="a"><b>Bags into lockers at Kintetsu-Nara station</b> <span>Large lockers by the east exit, about ¥700, Suica works. If they are full, the tourist office by the exit holds bags for ¥500.</span></p>
+        <div class="t">13:45</div><p class="a"><b>Nara Park, Kofuku-ji, the deer</b><span class="tag photo">photo</span><span class="tag cash">cash</span> <span>5 min uphill from the station. Buy deer crackers (¥200) away from the crowds or you will be mobbed. Bow to a deer and it bows back. Kofuku-ji's five-storey pagoda on the way.</span></p>
+        <div class="t">14:45</div><p class="a"><b>Todai-ji</b> <span>¥800. Nandaimon gate with the two guardian statues, then the Great Buddha hall. The hole in the pillar is the size of the Buddha's nostril. Closes 17:00 in October. One hour.</span></p>
+        <div class="t">15:50</div><p class="a"><b>Kasuga Taisha lantern path, Nakatanidou on the way back</b> <span>15 min through the woods on the stone lantern path (the moss ones), the shrine's hanging bronze lanterns, then back down Sanjo-dori to Nakatanidou for the mochi-pounding show and warm yomogi mochi.</span></p>
+        <div class="t">17:15</div><p class="a"><b>Collect bags, Kintetsu Rapid Express or Express to Osaka-Namba</b> <span>No booking. Tap Suica at the Kintetsu-Nara gate (¥680 each) and take any Rapid Express (快速急行) or Express (急行); the board may say Osaka-Namba or Kobe-Sannomiya, both stop at Osaka-Namba. Skip anything marked Limited Express (特急), which needs a reserved ticket. Trains every 10 to 20 min, about 40 min; Nara is the starting station, so you get seats and floor space for the trolleys. Not tied to a time, so stay later in Nara if the day allows.</span></p>
+        <div class="t">18:00</div><p class="a"><b>Osaka-Namba to the hotel</b> <span>Midosuji line from Namba one stop south to Daikokucho (2 min), exit 3, walk 5 min. With bags, a taxi from Namba is about ¥1,000 and door to door. Check in: ¥39,204 is paid here, card is fine, plus city tax, and ID for Jovis.</span></p>
+        <div class="t">19:15</div><p class="a"><b>Dotonbori</b><span class="tag photo">photo</span><span class="tag cash">cash</span> <span>Walk 15 min north via Nipponbashi, or Midosuji back to Namba. The Glico sign from Ebisubashi bridge, the canal, takoyaki at Wanaka or Kukuru, okonomiyaki at Mizuno (book or queue) or Ajinoya, kushikatsu at Daruma. Hozenji Yokocho and its moss-covered statue one lane south.</span></p>
+        <div class="t">22:00</div><p class="a"><b>Home.</b> <span>Walk 15 min or Midosuji one stop. Last trains after midnight.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--osaka)"><div class="d">Oct 28</div><div class="w">Wednesday</div><span class="chip">Osaka · full day</span><div class="sun">sunset 17:11</div></div>
+    <div>
+      <h3>Osaka Castle, Kuromon, Shinsekai on foot from the hotel, Umeda at sunset</h3>
+      <p class="sub">The hotel's location works in its favour today: Shinsekai is a 12 min walk, the JR Loop line at Shin-Imamiya goes straight to the castle, and the Midosuji line at Daikokucho goes straight to Umeda.</p>
+      <div class="base"><b>Base:</b> Centara Life Namba · breakfast at Kizu Market next door rather than the hotel's ¥2,500 add-on</div>
+      <div class="slots">
+        <div class="t">08:00</div><p class="a"><b>Breakfast at Kizu Market</b> <span>Two minutes from the hotel, Osaka's oldest wholesale market, sushi and kitsune udon counters open from early morning. Cheaper and better than the hotel breakfast.</span></p>
+        <div class="t">09:00</div><p class="a"><b>JR Osaka Loop line from Shin-Imamiya to Osakajokoen</b> <span>Shin-Imamiya is 8 min walk. 5 stops, about 13 min, direct.</span></p>
+        <div class="t">09:20</div><p class="a"><b>Osaka Castle</b> <span>10 min walk through the park to the keep, ¥600. The museum floors go quickly; the 8F observation deck is the reason to go up. Nishinomaru garden (¥200) for the classic view of the keep across the moat. 90 min.</span></p>
+        <div class="t">11:15</div><p class="a"><b>Tanimachi line Tanimachi 4-chome to Nipponbashi, or Loop line back</b> <span>Tanimachi 4-chome to Tanimachi 9-chome, change to the Sennichimae line one stop to Nipponbashi, about 20 min.</span></p>
+        <div class="t">11:45</div><p class="a"><b>Kuromon Market lunch</b><span class="tag cash">cash</span> <span>Grilled scallops, tuna cuts, fugu, fruit, all eaten standing at the stall. Busy but big. ¥2,000 to 3,000 a head grazing.</span></p>
+        <div class="t">13:15</div><p class="a"><b>Walk south to Shinsekai</b> <span>20 min down Sakaisuji, past Den Den Town (Osaka's Akihabara) if anyone wants a last look at figures, or Sakaisuji line one stop Nipponbashi to Ebisucho.</span></p>
+        <div class="t">13:45</div><p class="a"><b>Shinsekai and Tsutenkaku</b><span class="tag photo">photo</span> <span>Retro Osaka, kushikatsu's birthplace, the pufferfish lanterns. Tsutenkaku observation deck (¥1,000) and the slide down the outside (¥1,000, worth it once). Coffee at one of the old kissaten. Janjan Yokocho for the alley.</span></p>
+        <div class="t">15:30</div><p class="a"><b>Midosuji line Dobutsuen-mae to Umeda</b> <span>Direct, about 15 min. Umeda Sky Building is a 10 min walk north-west from the station through the underpass.</span></p>
+        <div class="t">16:15</div><p class="a"><b>Umeda Sky Building</b><span class="tag photo">photo</span> <span>Floating Garden observatory, ¥2,000. The escalator across the void is the ride. Sunset 17:11; be up by 16:30 for daylight, stay for the city lights.</span></p>
+        <div class="t">18:00</div><p class="a"><b>Midosuji line Umeda to Shinsaibashi</b> <span>10 min.</span></p>
+        <div class="t">18:30</div><p class="a"><b>Last dinner, Shinsaibashi and Amerikamura</b> <span>Shinsaibashi-suji arcade for last shopping (open until 21:00), Amerikamura for the street scene. Dinner: yakiniku or one more okonomiyaki. Don Quijote on Dotonbori for the airport snack haul if you have not done it.</span></p>
+        <div class="t">21:00</div><p class="a"><b>Home, pack.</b> <span>Midosuji Shinsaibashi to Daikokucho, 2 stops. Pack tonight. Alarms 05:00. Top up each Suica to at least ¥1,000 for tomorrow's Airport Express.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="stamp" style="--c:var(--osaka)"><div class="d">Oct 29</div><div class="w">Thursday</div><span class="chip">Departure · KIX</span><div class="sun">sunrise 06:14</div></div>
+    <div>
+      <h3>10:00 flight from Kansai, VN335 to Hanoi</h3>
+      <p class="sub">Vietnam Airlines VN335 leaves KIX Terminal 1 at 10:00; check-in closes about 90 min before, so aim to be there by 07:30. No booking for this leg: the Nankai Airport Express from Shin-Imamiya, 8 min on foot from the hotel, paid with Suica.</p>
+      <div class="base"><b>Base:</b> Centara Life Namba · check out at the desk, it is 24 hours</div>
+      <div class="slots">
+        <div class="t">05:40</div><p class="a"><b>Check out, walk to Shin-Imamiya (Nankai side)</b> <span>About 8 min with trolleys. Each Suica needs at least ¥1,000 on it; top up on Oct 28.</span></p>
+        <div class="t">06:00</div><p class="a"><b>Nankai Airport Express (空港急行) to Kansai Airport</b> <span>No booking. Tap Suica at the Nankai gate, about ¥970 each, about 45 min. Take any train marked 関西空港 / Kansai Airport; some Nankai trains from here go to Wakayama instead, so check the board, and if the train splits, ride the front section. Several departures an hour from before 06:00, so any one around 06:00 works. Early morning towards the airport is quiet: seats for all, trolleys by the doors.</span></p>
+        <div class="t">06:45</div><p class="a"><b>KIX Terminal 1</b> <span>Bag drop, security, immigration. Tax-free receipts are checked on departure only if asked; keep the goods in hand luggage. Gate by 09:20.</span></p>
+        <div class="t">10:00</div><p class="a"><b>Depart KIX on VN335.</b> <span>Hanoi 13:35, 5h35 layover airside in Noi Bai Terminal 2 (no visa, stay in the transit area), then VN983 at 19:10, Bengaluru 22:25. Bags are checked through to BLR.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Bookings, in the order they open</h2>
+  <div class="grid2">
+    <div class="item"><span class="done">done</span><b>Hotels, all four</b><span>Tokyo paid. Fuji paid, free cancel until Sep 23. Kyoto pay-later, free cancel until Oct 20. Osaka pay at hotel, free cancel until Oct 24.</span></div>
+    <div class="item"><span class="done">dropped</span><b>Shibuya Sky, Oct 21</b><span>Sold out. Replaced with the free Hikarie 11F sunset and Mag's Park. Cancellations sometimes reappear on the official site or Klook, so a last look the night before costs nothing.</span></div>
+    <div class="item"><span class="done">done</span><b>Nikko tour, Oct 23, 07:30 from Shinjuku</b><span>Klook, booking XRX118970, voucher KLK5727023048, 4 adults. Meet at Starbucks, Shinjuku Maynds Tower 1F; back around 18:30. Toshogu entry (~¥1,600) and lunch not included, bring cash. Free cancellation until Oct 22, 07:00 Japan time.</span></div>
+    <div class="item"><span class="done">done</span><b>Fuji Excursion 3, Oct 24, 07:30 Shinjuku to Shimoyoshida</b><span>Booked on Eki-net, reservation E86263, ¥16,040 for 4, Car 1 seats 6C/6D/7C/7D. Collect paper tickets at a JR East machine at Shinjuku on Oct 21 or 22: QR from the email, or pickup code 20422491937521288 + VISA ending 1356.</span></div>
+    <div class="item"><span class="done">done</span><b>Fujikyu bus 0174, Oct 25, 10:55 Kawaguchiko to Mishima north exit 12:25</b><span>Booked on Fujiyama Connect under Abel, reservation 2966511, order AR0000052715. QR shown from the booking page on the day; screenshots are blocked.</span></div>
+    <div class="item"><span class="done">done</span><b>Hikari 713, Oct 25, 13:46 Mishima to Kyoto 15:37</b><span>SmartEX reservation 2000, Car 12 seats 13D/13E/14D/14E, ¥45,240 paid. QR-Ticket per person from the SmartEX email; scan at the gate, no pickup needed. Optional: after Oct 19, add the four Welcome Suica numbers under "Designate IC card" to tap through instead.</span></div>
+    <div class="item"><span class="done">done</span><b>Aoniyoshi, Oct 27, 12:55 Kyoto to Nara</b><span>Car 4, twin seats 7A/7B (Abel, A28669) and 7C/7D (Jovis, A41252), ¥1,460 per pair. Base fare by Suica. Show the live e-ticket from the Kintetsu site, not a screenshot.</span></div>
+    <div class="item"><span class="done">decided</span><b>Nara to Osaka-Namba, Oct 27 evening</b><span>No booking needed. Kintetsu Rapid Express or Express, ¥680 on Suica, every 10 to 20 min, about 40 min.</span></div>
+    <div class="item"><span class="done">done</span><b>teamLab Borderless, Oct 22, 18:30 to 19:00 entry</b><span>Booked on teamLab's site, ticket ANMHLYARAMPT-0001, 4 adults, ¥18,000 paid. No cancellation. 2D code shows on the ticket page from 24 h before; screenshot it on Oct 21 evening.</span></div>
+    <div class="item"><b>Pontocho dinner, Oct 25 at 19:00</b><span>Two weeks ahead, for four. Ask the hotel to call if the site is Japanese-only.</span></div>
+    <div class="item"><span class="done">decided</span><b>Kansai Airport, Oct 29</b><span>No booking. Nankai Airport Express from Shin-Imamiya around 06:00, about ¥970 on Suica, 45 min.</span></div>
+  </div>
+
+  <h2>Getting around, by base</h2>
+  <div class="tbl"><table>
+    <tr><th>From</th><th>To</th><th>How</th><th>Time</th></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Shinjuku (JR, Keio, Busta)</td><td>Oedo line via Tochomae, 4 stops</td><td class="mono">10 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Tochomae (Metro Gov Building)</td><td>Oedo line, 3 stops</td><td class="mono">6 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Asakusa</td><td>Oedo to Kuramae, walk 6 min, Asakusa line 1 stop</td><td class="mono">35 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Shibuya</td><td>Walk or 1 stop to Higashi-Shinjuku, Fukutoshin line direct</td><td class="mono">20 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Harajuku</td><td>Oedo to Yoyogi, Yamanote 1 stop</td><td class="mono">25 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Imperial Palace (Otemon)</td><td>Oedo to Iidabashi, Tozai to Otemachi</td><td class="mono">25 min</td></tr>
+    <tr><td>Wakamatsu-Kawada</td><td>Haneda</td><td>Oedo to Daimon, Keikyu direct to the airport</td><td class="mono">60 min</td></tr>
+    <tr><td>Funatsu villa</td><td>Kawaguchiko station</td><td>Walk</td><td class="mono">3 min</td></tr>
+    <tr><td>Karasuma Gojo</td><td>Kyoto station (JR, Kintetsu, Shinkansen)</td><td>Karasuma line 1 stop</td><td class="mono">5 min</td></tr>
+    <tr><td>Karasuma Gojo</td><td>Gion, Pontocho, Kawaramachi</td><td>Walk east along Gojo or Shijo</td><td class="mono">20 min</td></tr>
+    <tr><td>Centara Life Namba</td><td>Dotonbori</td><td>Walk north, or Midosuji Daikokucho to Namba</td><td class="mono">15 min</td></tr>
+    <tr><td>Centara Life Namba</td><td>Kansai Airport</td><td>Walk to Shin-Imamiya, Nankai Airport Express</td><td class="mono">55 min</td></tr>
+    <tr><td>Centara Life Namba</td><td>Shinsekai, Tsutenkaku</td><td>Walk</td><td class="mono">12 min</td></tr>
+    <tr><td>Centara Life Namba</td><td>Osaka Castle</td><td>JR Loop line from Shin-Imamiya to Osakajokoen</td><td class="mono">20 min</td></tr>
+    <tr><td>Centara Life Namba</td><td>Umeda</td><td>Midosuji line from Daikokucho, direct</td><td class="mono">15 min</td></tr>
+  </table></div>
+
+  <h2>Practical notes</h2>
+  <div class="grid2">
+    <div class="item"><b>Transit</b><span>Suica on each phone, top up at any station machine or with the wallet app. No JR Pass; the only long-distance rail is Mishima to Kyoto. A Kawaguchiko Red/Green line 2-day bus pass (¥1,500) for Oct 24 to 25.</span></div>
+    <div class="item"><b>Luggage</b><span>One takkyubin send from a Tokyo convenience store on Oct 23 to the Kyoto hotel. Overnight bag only for Fuji. Kyoto to Nara to Osaka is carried; Nara uses station lockers for four hours.</span></div>
+    <div class="item"><b>Rooms</b><span>Tokyo is one apartment for four. Fuji is a three-bedroom villa. Kyoto and Osaka are two doubles each. Decide pairings once.</span></div>
+    <div class="item"><b>Weather</b><span>Tokyo 14 to 20°C, Kyoto and Osaka similar. Kawaguchiko at dawn about 5°C, Nikko's lake similar. One warm layer and a light rain shell each; October has a typhoon tail some years, check the week before.</span></div>
+    <div class="item"><b>Closures</b><span>Imperial East Gardens closed Mon and Fri (you go Tue). Aoniyoshi rests on Thursdays (you ride Tue). Most Tokyo museums close Mon. Todai-ji closes 17:00 in October.</span></div>
+    <div class="item"><b>Cash</b><span>Omoide Yokocho, Golden Gai, Jindaiji soba, Kawaguchiko hoto shops, Nishiki stalls, Nara crackers, Kuromon and Dotonbori counters are cash-first. 7-Eleven ATMs take foreign cards; ¥20,000 a head in reserve is enough.</span></div>
+    <div class="item"><b>Fuji odds</b><span>Late October is statistically the clearest month. Even so, mornings win: Chureito on the 24th and the lakeshore on the 25th are the two shots. If both are clouded, Chureito is still worth it for the pagoda and maples.</span></div>
+    <div class="item"><b>Group</b><span>Jovis, Abel, Sheethal, Anria. Bookings are under Anria (Fuji, Kyoto) and Jovis (Tokyo, Osaka). Share this page and the four PDFs in the group chat.</span></div>
+  </div>
+</div>
+<a href="../" onclick="if(history.length>1&&document.referrer.indexOf(location.origin)===0){history.back();return false}" style="position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:999;display:inline-flex;align-items:center;gap:6px;padding:11px 16px;border-radius:999px;background:#1f6feb;color:#fff;font:700 14px/1 system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 22px rgba(13,58,147,.35)">&#8592; Back to app</a><script>(()=>{const re=/\b([01]?\d|2[0-3]):([0-5]\d)\b(?!\s?[ap]m)/g,f=(_,h,m)=>((h%12)||12)+':'+m+(h<12?' am':' pm');const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(/SCRIPT|STYLE/.test(n.parentNode.nodeName))continue;const t=n.nodeValue.replace(re,(a,h,m)=>f(a,+h,m));if(t!==n.nodeValue)n.nodeValue=t}})()</script></body></html>

@@ -19,12 +19,12 @@ out = root / 'dist'; (root / 'site').mkdir(parents=True, exist_ok=True); out.mkd
 import shutil
 if (root / 'art').exists(): shutil.copytree(root / 'art', root / 'site' / 'art', dirs_exist_ok=True)
 import hashlib, json
-for d in ('icons',):
+for d in ('icons', 'itinerary'):
     if (root / d).exists(): shutil.copytree(root / d, root / 'site' / d, dirs_exist_ok=True)
 shutil.copy(src / 'manifest.webmanifest', root / 'site' / 'manifest.webmanifest'); shutil.copy(src / '_headers', root / 'site' / '_headers')
 site = root / 'site'
-files = ['./', './index.html', './manifest.webmanifest'] + sorted('./' + str(p.relative_to(site)) for d in ('art', 'icons') if (site / d).exists() for p in (site / d).iterdir() if p.is_file())
-ver = 'kt-' + hashlib.sha1(b''.join((site / f[2:]).read_bytes() for f in files if f != './')).hexdigest()[:10]
+files = ['./', './manifest.webmanifest'] + sorted('./' + str(p.relative_to(site)).replace('index.html', '') for d in ('art', 'icons', 'itinerary') if (site / d).exists() for p in (site / d).iterdir() if p.is_file())
+ver = 'kt-' + hashlib.sha1((src / 'sw.js').read_bytes() + b''.join((site / (f[2:] if not f.endswith('/') else f[2:] + 'index.html')).read_bytes() for f in files)).hexdigest()[:10]
 (site / 'sw.js').write_text((src / 'sw.js').read_text().replace('__VERSION__', ver).replace('__FILES__', json.dumps(files)))
 print('sw', ver, len(files), 'files')
 print('built', (out / 'kitsune-tabi.html').stat().st_size // 1024, 'KB')
