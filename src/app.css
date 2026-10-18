@@ -313,3 +313,39 @@ a.big,a.big *{text-decoration:none;color:inherit}a.big>span>b{color:var(--navy)}
 .hero .total em{font-style:normal;font-weight:800;font-size:17px;color:#ffd77a;margin:2px 0 4px}
 .shoprow .price{text-align:right;line-height:1.15}.shoprow .price small{display:block;font-size:12px;font-weight:700;color:var(--ink-3)}
 .pricehint{font-size:14px;font-weight:700;color:var(--ink-3);margin:2px 4px 0}
+
+.entrybox p{margin:0 0 12px;color:var(--ink-2);font-size:14px}
+.entrybox .eg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.entrybox .eg button{display:flex;align-items:center;gap:10px;padding:12px;border-radius:18px;background:var(--sky);text-align:left;font-size:15px;color:var(--navy);transition:transform .2s var(--spring)}
+.entrybox .eg button:active{transform:scale(.96)}
+.entrybox .eg .qi{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--blue);display:grid;place-items:center;flex:none}.entrybox .eg .qi svg{width:18px}
+.entrybox .eg b{flex:1}.entrybox .eg small{font-size:11px;font-weight:800;color:var(--navy);background:var(--amber);padding:3px 8px;border-radius:999px}
+.entrybox .eg .me{background:#fff7e6;outline:2px solid var(--amber)}
+.entry{position:fixed;inset:0;z-index:95;background:#fff;display:flex;flex-direction:column;align-items:center;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto;animation:inF .25s both}
+.entry .et{width:100%;background:#1c2fa8;color:#fff;border-radius:18px;padding:10px 14px;text-align:center}
+.entry .et small{display:block;font-size:12px;font-weight:700;opacity:.85}.entry .et b{font-size:16px}
+.entry img{width:min(86vw,400px);aspect-ratio:1;image-rendering:pixelated;margin:18px 0 8px}
+.entry .en{font-family:var(--display);font-size:30px;color:var(--navy)}
+.entry .ep{font-weight:800;letter-spacing:.06em;color:var(--ink-2);font-size:14px;margin-top:2px}
+.entry .eswitch{display:flex;gap:6px;margin:16px 0 8px;background:var(--sky);padding:5px;border-radius:999px}
+.entry .eswitch button{padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px;color:var(--ink-2)}
+.entry .eswitch .on{background:var(--blue);color:#fff}
+.entry .eh{color:var(--ink-3);font-size:13px;text-align:center;max-width:300px;margin:4px 0 10px}
+.entry .eclose{margin-top:auto;width:100%;max-width:400px;padding:15px;border-radius:18px;background:var(--navy);color:#fff;font-weight:800}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.docchip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;background:var(--sky);color:var(--blue-d);font-weight:800;font-size:12.5px}
+.docchip svg{width:15px;height:15px;flex:none}
+.filegrp{padding:4px 0 6px}.filegrp+.filegrp{border-top:1px dashed var(--sky-2);padding-top:10px}
+.filegrp>small{display:block;font-weight:800;font-size:12px;color:var(--blue-d);letter-spacing:.04em;text-transform:uppercase;margin:2px 0 6px}
+.filerow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 2px;color:var(--ink-3)}
+.filerow>span:nth-child(2){flex:1;min-width:0}.filerow b{display:block;color:var(--navy);font-size:14.5px}.filerow span span{font-size:12.5px;color:var(--ink-2)}
+.filerow .fi{width:40px;height:46px;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;background:var(--red);flex:none}.filerow .fi.png{background:var(--blue)}
+.docview{position:fixed;inset:0;z-index:96;background:#2a3147;display:flex;flex-direction:column;animation:inF .25s both}
+.dvbar{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;background:var(--navy);color:#fff}
+.dvt{min-width:0}.dvt b{display:block;font-size:16px}.dvt small{opacity:.8;font-size:12.5px}
+.dvpages{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px;display:grid;gap:12px;align-content:start}
+.dvpages img{width:100%;height:auto;background:#fff;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.dvopen{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 12px calc(12px + env(safe-area-inset-bottom,0px));padding:14px;border-radius:16px;background:var(--amber);color:var(--navy);font-weight:800;text-decoration:none}
+.dvopen svg{width:18px}
+.dvhint{margin:0;color:#c9d3ee;font-size:12.5px;text-align:center}

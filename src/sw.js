@@ -2,7 +2,7 @@
 const V = '__VERSION__', CORE = __FILES__;
 // Cloudflare Pages redirects /index.html to /, and a redirected response can't answer a page load, so store clean copies
 const clean = res => res.redirected ? res.blob().then(b => new Response(b, { status: 200, headers: res.headers })) : res;
-self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => Promise.all(CORE.map(u => fetch(u, { cache: 'reload' }).then(clean).then(r => c.put(u, r))))).then(() => self.skipWaiting())); });
+self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => Promise.allSettled(CORE.map(u => fetch(u, { cache: 'reload' }).then(r => { if (!r.ok) throw r.status; return clean(r); }).then(r => c.put(u, r))))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== 'kt-fonts').map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
   const r = e.request, u = new URL(r.url);

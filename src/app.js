@@ -49,6 +49,8 @@ const I = {
   reorder: '<path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/>',
   undo: '<path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4"/>',
+  img: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
   bag: '<path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
   map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/>'
@@ -269,13 +271,13 @@ const VIEWS = {
   },
   item(r) {
     const it = ITEM[r.id], d = DAY(it.day), c = cityOf(d), rows = compute(d), x = rows.find(y => y.it.id === it.id) || {};
-    const tabs = [['see', '見る', 'See', it.see], ['story', '物語', 'Story', it.story], ['eat', '食べる', 'Eat', it.eat], ['tix', '券', 'Ticket', it.bk || (it.stay && it.k === 'stay')]].filter(t => t[3]);
+    const tabs = [['see', '見る', 'See', it.see], ['story', '物語', 'Story', it.story], ['eat', '食べる', 'Eat', it.eat], ['tix', '券', 'Ticket', it.bk || (it.stay && it.k === 'stay') || docsFor(it.id).length]].filter(t => t[3]);
     const cur = r.tab && tabs.some(t => t[0] === r.tab) ? r.tab : (tabs[0] ? tabs[0][0] : null);
     let pane = '';
     if (cur === 'see') pane = `<div class="box"><h3>${it.k === 'meal' ? 'Good to know' : 'Things to see'}</h3><ul class="list">${it.see.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>${it.op ? `<div class="box"><b>Opens ${t12(it.op)}</b></div>` : ''}${it.by ? `<div class="box"><b>Best to arrive by ${t12(it.by)}</b></div>` : ''}`;
     if (cur === 'story') pane = `<div class="box story">${it.story.map(p => `<p>${esc(p)}</p>`).join('')}</div>`;
     if (cur === 'eat') pane = `${it.eat.d ? `<div class="box"><h3>Dishes to try</h3>${it.eat.d.map(e => { const sp = sprite(dishIdx(e[0] + ' ' + e[1])); return `<div class="dish"><span class="bowl">${sp || ic('bowl')}</span><div><b>${esc(e[0])}</b><span class="j">${esc(e[1])}</span><p>${esc(e[2])}</p></div></div>`; }).join('')}</div>` : ''}${it.eat.s ? `<div class="box"><h3>Where to go</h3>${it.eat.s.map(e => `<div class="spot"><b>${esc(e[0])}</b><span>${esc(e[1])}</span></div>`).join('')}</div>` : ''}`;
-    if (cur === 'tix') pane = `${it.bk ? `<div class="box"><h3>Booking details</h3>${it.bk.map(b => `<div class="tk">${esc(b)}</div>`).join('')}</div>` : ''}${it.stay && STAYS[it.stay] ? `<button class="btn full blue" data-taxi="${it.stay}">${ic('taxi')} Show taxi card (Japanese)</button>` : ''}`;
+    if (cur === 'tix') pane = `${docsFor(it.id).length ? `<div class="box"><h3>Tickets and files</h3><div class="chips" style="margin:0">${docsFor(it.id).map(docChip).join('')}</div></div>` : ''}${it.bk ? `<div class="box"><h3>Booking details</h3>${it.bk.map(b => `<div class="tk">${esc(b)}</div>`).join('')}</div>` : ''}${it.stay && STAYS[it.stay] ? `<button class="btn full blue" data-taxi="${it.stay}">${ic('taxi')} Show taxi card (Japanese)</button>` : ''}`;
     const canStep = flexible(x) && !x.skip;
     const di = itemDish(it), sp = sprite(di);
     const pic = sp ? `<div class="dpic food">${sp}` : (it.k === 'place' ? `<div class="dpic" style="--c:${c.c}">${img(cityArt(d.city))}<span class="k">${c.jp}</span>` : `<div class="dpic ${it.k === 'meal' ? 'food' : ''}" style="--c:${c.c}"><span class="bigic">${ic(kindIcon(it), 1.6)}</span><span class="k">${c.jp}</span>`);
@@ -288,12 +290,13 @@ const VIEWS = {
       ${tabs.length > 1 ? `<div class="seg">${tabs.map(t => `<button class="${t[0] === cur ? 'on' : ''}" data-tab="${t[0]}">${t[2]}<small>${t[1]}</small></button>`).join('')}</div>` : ''}
       <div class="pane"><div class="pc">${pane || '<div class="empty">' + mascot('happy', 'width:110px;margin:0 auto') + 'Nothing to read here, just go!</div>'}</div></div>
       ${canStep ? `<div class="paybar"><div><small>Planned time · ${dur(it.mn)} to ${dur(it.mx)}</small><b class="num">${dur(x.du)}</b></div><div class="sb"><button data-step="-5" aria-label="5 minutes less">−</button><span class="num" style="font-weight:800;min-width:26px;text-align:center">5m</span><button data-step="5" aria-label="5 minutes more">+</button></div></div>` : ''}
-      <div class="actions">${it.k !== 'home' && it.k !== 'ride' ? `<a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(qOf(it))}" target="_blank" rel="noopener">${ic('map')} Map</a>` : ''}${x.skip ? `<button class="btn pri" data-restore="${it.id}">Restore</button>` : `<button class="btn ${x.done ? '' : 'pri'}" data-done>${x.done ? 'Undo done' : '済 Mark done'}</button>`}${!x.skip && !it.fx && it.k !== 'home' && it.p !== 'm' ? `<button class="btn full" data-skip>Skip this stop</button>` : ''}</div>`;
+      <div class="actions">${it.id === 'hnd' ? `<button class="btn full blue" data-entry="${me && ENTRY[me] ? me : 'Jovis'}">${ic('qr')} Show immigration QR</button>` : ''}${it.k !== 'home' && it.k !== 'ride' ? `<a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(qOf(it))}" target="_blank" rel="noopener">${ic('map')} Map</a>` : ''}${x.skip ? `<button class="btn pri" data-restore="${it.id}">Restore</button>` : `<button class="btn ${x.done ? '' : 'pri'}" data-done>${x.done ? 'Undo done' : '済 Mark done'}</button>`}${!x.skip && !it.fx && it.k !== 'home' && it.p !== 'm' ? `<button class="btn full" data-skip>Skip this stop</button>` : ''}</div>`;
   },
   wallet() {
-    const stays = Object.entries(STAYS).map(([k, s], i) => `<div class="box rise" style="--i:${i}"><button class="stay" data-taxi="${k}"><span class="bub" style="--k:#1f6feb">${ic('bed')}</span><span style="flex:1"><b>${esc(s.n)}</b><br><small style="color:var(--ink-2)">${esc(s.dates)} · ${esc(s.ref)}</small></span><span class="tag fx">Taxi card</span></button></div>`).join('');
-    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:var(--blue-d)">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + t12(i.at) + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>`).join('')}</div>`; }).join('');
-    return `<header class="hero">${mascot('proud', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">券 Wallet</div><h1>Tickets and taxi cards</h1><div class="sub">Every booking in one place.</div>${clouds()}</header><div class="wal"><div class="section-t" style="margin:8px 4px 10px"><h2>Where we sleep</h2><span>Tap for Japanese</span></div>${stays}<div class="section-t" style="margin:20px 4px 10px"><h2>Bookings</h2></div>${bks}</div>`;
+    const stays = Object.entries(STAYS).map(([k, s], i) => `<div class="box rise" style="--i:${i}"><button class="stay" data-taxi="${k}"><span class="bub" style="--k:#1f6feb">${ic('bed')}</span><span style="flex:1"><b>${esc(s.n)}</b><br><small style="color:var(--ink-2)">${esc(s.dates)} · ${esc(s.ref)}</small></span><span class="tag fx">Taxi card</span></button>${docsFor(k).length ? `<div class="chips">${docsFor(k).map(d => docChip(d, 'Booking confirmation')).join('')}</div>` : ''}</div>`).join('');
+    const bks = DAYS.map(d => { const its = d.items.filter(i => i.bk && i.k !== 'stay'); if (!its.length) return ''; return `<div class="box"><h3 style="color:var(--blue-d)">Day ${dayNo(d)} · ${dateLabel(d)}</h3>${its.map(i => `<button class="spot" data-item="${i.id}" style="display:block;width:100%;text-align:left"><b>${i.at ? '<span class="num">' + t12(i.at) + '</span> · ' : ''}${esc(i.n)}</b>${i.bk.map(b => `<span style="display:block">${esc(b)}</span>`).join('')}</button>${docsFor(i.id).length ? `<div class="chips">${docsFor(i.id).map(docChip).join('')}</div>` : ''}`).join('')}</div>`; }).join('');
+    const files = DAYS.map(d => { const ds = DOCS.filter(x => x.day === d.id); return ds.length ? `<div class="filegrp"><small>Day ${dayNo(d)} · ${dateLabel(d)}</small>${ds.map(x => `<button class="filerow" data-doc="${x.f}"><span class="fi ${x.x}">${x.x.toUpperCase()}</span><span><b>${esc(x.t)}</b><span>${esc(x.sub)}</span></span>${ic('back').replace('<svg', '<svg style="transform:rotate(180deg);width:18px;flex:none"')}</button>`).join('')}</div>` : ''; }).join('');
+    return `<header class="hero">${mascot('proud', 'position:absolute;right:12px;top:calc(12px + env(safe-area-inset-top,0px));width:96px;z-index:2')}<div class="eyebrow">券 Wallet</div><h1>Tickets and taxi cards</h1><div class="sub">Every booking in one place.</div>${clouds()}</header><div class="wal"><div class="section-t" style="margin:8px 4px 10px"><h2>Arrival QR</h2><span>入国</span></div><div class="box rise entrybox"><p>Visit Japan Web code for immigration and customs at Haneda. Tap a name to show it full screen.</p><div class="eg">${entryOrder().map((p, i) => `<button class="${p === me ? 'me' : ''}" data-entry="${p}"><span class="qi">${ic('qr')}</span><b>${p}</b>${p === me ? '<small>You</small>' : ''}</button>`).join('')}</div></div><div class="section-t" style="margin:20px 4px 10px"><h2>Where we sleep</h2><span>Tap for Japanese</span></div>${stays}<div class="section-t" style="margin:20px 4px 10px"><h2>Bookings</h2></div>${bks}<div class="section-t" style="margin:20px 4px 10px"><h2>All files</h2><span>${DOCS.length} originals</span></div><div class="box">${files}</div></div>`;
   },
   shop() {
     const L = shop(), todo = L.filter(x => x.p == null), got = L.filter(x => x.p != null).sort((a, b) => b.at - a.at), total = got.reduce((a, x) => a + x.p, 0);
@@ -362,6 +365,8 @@ function bind(v, r) {
     if (t.dataset.tab) { r.tab = t.dataset.tab; return refresh(); }
     if (t.dataset.city) { r.city = t.dataset.city; return refresh(); }
     if (t.dataset.taxi) return taxi(t.dataset.taxi);
+    if (t.dataset.entry) return showEntry(t.dataset.entry);
+    if (t.dataset.doc) return showDoc(t.dataset.doc);
     const day = r.v === 'day' ? DAY(r.id) : (r.v === 'item' ? DAY(ITEM[r.id].day) : null);
     if (t.dataset.task != null) { const all = store.get(TK) || {}; const a = all[day.id] = all[day.id] || []; const i = +t.dataset.task; const k = a.indexOf(i); k < 0 ? a.push(i) : a.splice(k, 1); store.set(TK, all); t.classList.toggle('on'); return; }
     if (t.dataset.restore) { delete X(day.id, t.dataset.restore).sk; return afterChange(day, 'late'); }
@@ -458,6 +463,51 @@ async function shareLink() {
   const url = location.href.split('#')[0] + '#' + payload();
   try { if (navigator.share) { await navigator.share({ title: me + '\'s Konnichiwa plan', text: 'Tap to sync our Japan plan', url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { sheet(`<h2>Copy this link</h2><p>Long-press to copy, then send it in the group.</p><div class="tk">${esc(url)}</div>`); }
+}
+
+// ---------- original tickets and confirmations (docs/), with page images in docs/view/ for offline viewing
+const DOCS = [
+  ['flight-blr-hnd-oct18', 'pdf', 4, 'Flights to Tokyo', 'Bengaluru to Haneda via Hanoi, e-ticket', ['vn982']],
+  ['stay-tokyo', 'pdf', 1, 'BITES by Voyan', 'Airbnb confirmation', ['bites']],
+  ['teamlab-borderless-oct22', 'png', 1, 'teamLab Borderless', 'Entry ticket', ['teamlab']],
+  ['nikko-tour-oct23-klook', 'pdf', 3, 'Nikko day tour', 'Klook voucher', ['meet']],
+  ['fuji-excursion-oct24', 'pdf', 2, 'Fuji Excursion', 'Reservation, collect tickets at the station', ['pickup', 'fexc']],
+  ['stay-fuji', 'pdf', 2, 'Villa in Funatsu', 'Booking.com confirmation', ['villa']],
+  ['bus-kawaguchiko-mishima-oct25', 'png', 1, 'Bus to Mishima', 'Highway bus ticket', ['bus']],
+  ['shinkansen-mishima-kyoto-oct25', 'png', 1, 'Hikari 713 booking', 'SmartEX reservation', ['hikari']],
+  ['shinkansen-qr-car12-13D', 'pdf', 1, 'Shinkansen QR · 13D', 'Car 12, seat 13D', ['hikari']],
+  ['shinkansen-qr-car12-13E', 'pdf', 1, 'Shinkansen QR · 13E', 'Car 12, seat 13E', ['hikari']],
+  ['shinkansen-qr-car12-14D', 'pdf', 1, 'Shinkansen QR · 14D', 'Car 12, seat 14D', ['hikari']],
+  ['shinkansen-qr-car12-14E', 'pdf', 1, 'Shinkansen QR · 14E', 'Car 12, seat 14E', ['hikari']],
+  ['stay-kyoto', 'pdf', 1, 'Smile Hotel Kyoto', 'Agoda confirmation', ['smile']],
+  ['aoniyoshi-kyoto-nara-jovis-7CD', 'pdf', 2, 'Aoniyoshi · 7C 7D', "Jovis's booking", ['aoni']],
+  ['aoniyoshi-kyoto-nara-abel-7AB', 'pdf', 2, 'Aoniyoshi · 7A 7B', "Abel's booking", ['aoni']],
+  ['aoniyoshi-receipt-jovis', 'pdf', 1, 'Aoniyoshi receipt', "Jovis's payment", ['aoni']],
+  ['aoniyoshi-receipt-abel', 'pdf', 1, 'Aoniyoshi receipt', "Abel's payment", ['aoni']],
+  ['stay-osaka', 'pdf', 1, 'Centara Life Namba', 'Hotel confirmation', ['centara']],
+  ['flight-kix-blr-oct29', 'pdf', 3, 'Flights home', 'Kansai to Bengaluru via Hanoi, e-ticket', ['vn335']]
+].map(([f, x, n, t, sub, items]) => ({ f, x, n, t, sub, items, day: (DAYS.find(d => d.items.some(i => items.includes(i.id))) || {}).id }));
+const docsFor = id => DOCS.filter(d => d.items.includes(id));
+const docChip = (d, label) => `<button class="docchip" data-doc="${d.f}">${ic(d.x === 'pdf' ? 'file' : 'img')}<span>${esc(label || d.t)}</span></button>`;
+function showDoc(f) {
+  const d = DOCS.find(x => x.f === f); if (!d) return;
+  document.querySelectorAll('.docview').forEach(e => e.remove());
+  const v = document.createElement('div'); v.className = 'docview';
+  v.innerHTML = `<div class="dvbar"><button class="iconbtn" data-close aria-label="Close">${ic('back')}</button><div class="dvt"><b>${esc(d.t)}</b><small>${esc(d.sub)}${d.n > 1 ? ' · ' + d.n + ' pages' : ''}</small></div></div><div class="dvpages"><p class="dvhint">Pinch to zoom. Saved on this phone, works offline.</p>${Array.from({ length: d.n }, (_, i) => `<img src="docs/view/${d.f}-${i + 1}.webp" alt="Page ${i + 1}" loading="${i ? 'lazy' : 'eager'}">`).join('')}</div><a class="dvopen" href="docs/${d.f}.${d.x}" target="_blank" rel="noopener" download>${ic('file')} Open original ${d.x.toUpperCase()}</a>`;
+  v.onclick = e => { if (e.target.closest('[data-close]')) v.remove(); };
+  document.body.appendChild(v);
+}
+
+// ---------- Visit Japan Web entry QR, one per person
+const ENTRY = { Jovis: 'ALOOR JOVIS JOSEPH', Anria: 'JOY ANRIA', Abel: 'ALOOR ABEL JOSEPH', Sheethal: 'CHIRAYATH RAPHEAL SHEETHAL' };
+const entryOrder = () => me && ENTRY[me] ? [me, ...PEOPLE.filter(p => p !== me)] : PEOPLE;
+function showEntry(who) {
+  document.querySelectorAll('.entry').forEach(e => e.remove());
+  who = who || entryOrder()[0];
+  const d = document.createElement('div'); d.className = 'entry';
+  const paint = () => { d.innerHTML = `<div class="et"><small>Visit Japan Web</small><b>Immigration and customs</b></div><img src="entry/${who.toLowerCase()}.png" alt="Entry QR for ${esc(who)}"><div class="en">${esc(who)}</div><div class="ep">${esc(ENTRY[who])}</div><div class="eswitch">${entryOrder().map(p => `<button class="${p === who ? 'on' : ''}" data-who="${p}">${p}</button>`).join('')}</div><p class="eh">Turn the brightness up. Show this at immigration, then again at the customs kiosk.</p><button class="eclose" data-close>Close</button>`; };
+  paint(); d.onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.who) { who = b.dataset.who; return paint(); } if (b.dataset.close != null) d.remove(); };
+  document.body.appendChild(d);
 }
 
 // ---------- shopping (this phone only)
